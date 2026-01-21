@@ -3,27 +3,38 @@ import jwt from 'jsonwebtoken';
 import { TUser, TUserPayload } from '../../types/user';
 import { prisma } from '../../config/prisma';
 import { TProfileInput } from './profile.validation';
-
-
-
-
-
+import { AppError } from '../../utils/AppError';
+import { createEmailToken } from '../../utils/createEmailToken';
+import sendEmail from '../../utils/sendEmail';
 
 
 
 const register = async (payload: TUser) => {
+
+    const isExist = await prisma.user.findUnique({ where: { email: payload.email } })
+    if (isExist) {
+        throw new AppError(404, "User already exists")
+    }
+
 
     const result = await prisma.user.create({
         data: {
             ...payload
         }
     })
+
+    if (!result.isEmailVerified) {
+        const token = createEmailToken(result.id);
+        const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
+        await sendEmail(result.email, "Verify your email", `Please click on this link to verify your email: ${link}`);
+        console.log("email send successfull")
+    }
+
     return result
 }
 
 
 const login = async (payload: TUser) => {
-
     const result = await prisma.user.findUnique({
         where: {
             email: payload.email,
@@ -33,7 +44,6 @@ const login = async (payload: TUser) => {
     if (!result) {
         throw new Error("User not found")
     }
-
     const jwtPayload = {
         id: result.id,
         // name: result.name,
@@ -42,18 +52,28 @@ const login = async (payload: TUser) => {
         createdAt: result.createdAt,
         // updatedAt: result.updatedAt
     }
-
-    
-
     const token = jwt.sign(jwtPayload, process.env.JWT_SECRET || "ebdwegweuweurgweurguwer6734873457" as string, {
         expiresIn: "7d"
     })
     console.log(token)
-
-
-
-    return {token}
+    return { token }
 }
+
+const verifyEmail = async (token: string) => {
+    const decoded = jwt.verify(token, process.env.EMAIL_SECRET as string) as {
+        userId: string; id: string
+    };
+    console.log(decoded)
+    const user = await prisma.user.findFirst({ where: { id: decoded.userId } });
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+    await prisma.user.update({
+        where: { id: decoded.userId },
+        data: { isEmailVerified: true }
+    });
+    return { message: "Email verified successfully" };
+};
 
 
 
@@ -64,59 +84,55 @@ const getAllUsers = async () => {
 
 }
 
-
-
-
-
 /////// Profile ////////
 
 const createProfile = async (payload: TProfileInput, user: TUserPayload, avatarUrl: string | null, resumeUrl: string | null) => {
 
     payload.avatar = avatarUrl || undefined;
     payload.resumeUpload = resumeUrl || undefined;
-  const { workExperience, education, ...rest } = payload;
+    const { workExperience, education, ...rest } = payload;
 
 
 
 
 
-  const result = await prisma.profile.upsert({
-    where: { userId: user.id }, // unique field
-    update: {
-      ...rest,
+    const result = await prisma.profile.upsert({
+        where: { userId: user.id }, // unique field
+        update: {
+            ...rest,
 
-      // For nested relations, you might want to replace or update existing entries
-      workExperience: {
-        deleteMany: {}, // optional: delete old entries
-        create: workExperience?.map((we) => ({ ...we })),
-      },
-      education: {
-        deleteMany: {},
-        create: education?.map((edu) => ({ ...edu })),
-      },
-    },
-    create: {
-      ...rest,
-      userId: user.id,
-      workExperience: {
-        create: workExperience?.map((we) => ({ ...we })),
-      },
-      education: {
-        create: education?.map((edu) => ({ ...edu })),
-      },
-    },
-  });
+            // For nested relations, you might want to replace or update existing entries
+            workExperience: {
+                deleteMany: {}, // optional: delete old entries
+                create: workExperience?.map((we) => ({ ...we })),
+            },
+            education: {
+                deleteMany: {},
+                create: education?.map((edu) => ({ ...edu })),
+            },
+        },
+        create: {
+            ...rest,
+            userId: user.id,
+            workExperience: {
+                create: workExperience?.map((we) => ({ ...we })),
+            },
+            education: {
+                create: education?.map((edu) => ({ ...edu })),
+            },
+        },
+    });
 
-  return result;
+    return result;
 };
 
 
 const getSingleUser = async (payload: TUserPayload) => {
 
-const {email} = payload
+    const { email } = payload
 
     const result = await prisma.user.findUnique({
-        where: { email }, 
+        where: { email },
         select: {
             id: true,
             fullName: true,
@@ -140,7 +156,8 @@ export const AuthService = {
     getAllUsers,
     createProfile,
     getSingleUser,
-    login
+    login,
+    verifyEmail
 }
 
 

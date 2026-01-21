@@ -39,7 +39,7 @@ export const profileSchema = z.object({
   bio: z.string().min(1, "Bio is required"),
   isVerified: z.boolean(),
   totalExperience: z.string().min(1, "Total experience is required"),
-  portfolioLink: z.string().url().optional(),
+  portfolioLink: z.string().optional(),
   socialLink: z.array(z.string().url()).optional(),
   resumeUpload: z.string().url().optional(),
   skill: z.array(z.string().min(1)).optional(),

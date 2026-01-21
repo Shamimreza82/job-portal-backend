@@ -12,7 +12,7 @@ const register = catchAsync(async (req, res) => {
 
   res.status(201).json({
     status: true,
-    message: "User created successfully",
+    message: "Registration successful. Please verify your email.",
     data: {
       user: result,
     },
@@ -40,6 +40,21 @@ const login = catchAsync(async (req, res) => {
     data: { token: token },
   })
 })
+
+
+const verifyEmail = catchAsync(async (req, res) => {
+
+  const token = req.query.token as string;
+  const result = await AuthService.verifyEmail(token)
+  if (!result) {
+    res.redirect(`${process.env.CLIENT_URL}/verify-error`);
+  } else {
+    res.redirect(`${process.env.CLIENT_URL}/login`);
+  }
+})
+
+
+
 
 const getAllUsers = catchAsync(async (req, res) => {
 
@@ -76,37 +91,37 @@ const getSingleUser = catchAsync(async (req, res) => {
 
 const createProfile = catchAsync(async (req, res) => {
 
-const data = JSON.parse(req.body.data);
+  const data = JSON.parse(req.body.data);
   const validatedData = profileSchema.parse(data);
 
-const files = req.files as {
-  avater?: Express.Multer.File[];
-  resume?: Express.Multer.File[];
-};
+  const files = req.files as {
+    avater?: Express.Multer.File[];
+    resume?: Express.Multer.File[];
+  };
 
-const avater = files.avater?.[0];
-const resume = files.resume?.[0];
+  const avater = files.avater?.[0];
+  const resume = files.resume?.[0];
   let avatarUrl: string | null = null;
-    let resumeUrl: string | null = null;
+  let resumeUrl: string | null = null;
   // const avater = 
 
- // 🖼 Avatar upload
-    if (avater) {
-      avatarUrl = await uploadToCloudinary(
-        avater.buffer,
-        "profiles/avatars",
-        "image"
-      );
-    }
+  // 🖼 Avatar upload
+  if (avater) {
+    avatarUrl = await uploadToCloudinary(
+      avater.buffer,
+      "profiles/avatars",
+      "image"
+    );
+  }
 
-    // 📄 Resume upload
-    if (resume) {
-      resumeUrl = await uploadToCloudinary(
-        resume.buffer,
-        "profiles/resumes",
-        "raw"
-      );
-    }
+  // 📄 Resume upload
+  if (resume) {
+    resumeUrl = await uploadToCloudinary(
+      resume.buffer,
+      "profiles/resumes",
+      "raw"
+    );
+  }
 
 
 
@@ -127,7 +142,8 @@ export const AuthController = {
   getAllUsers,
   getSingleUser,
   login,
-  createProfile
+  createProfile,
+  verifyEmail
 }
 
 

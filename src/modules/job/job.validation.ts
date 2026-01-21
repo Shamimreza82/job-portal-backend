@@ -9,8 +9,6 @@ export const jobCategorySchema = z.object({
 
   desc: z
     .string()
-    .min(5, "Description must be at least 5 characters")
-    .max(500, "Description is too long")
     .optional(),
 });
 

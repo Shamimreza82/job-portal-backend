@@ -6,10 +6,19 @@ import { TProfileInput } from './profile.validation';
 import { AppError } from '../../utils/AppError';
 import { createEmailToken } from '../../utils/createEmailToken';
 import sendEmail from '../../utils/sendEmail';
+import bcrypt from "bcryptjs";
+import { verifyEmailTemplate } from '../../utils/emailTemplate/VerifyLink';
 
 
 
 const register = async (payload: TUser) => {
+
+
+    const salt = bcrypt.genSaltSync(process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10);
+    const hash = bcrypt.hashSync(payload.password, salt);
+    payload.password = hash;
+
+
 
     const isExist = await prisma.user.findUnique({ where: { email: payload.email } })
     if (isExist) {
@@ -26,21 +35,39 @@ const register = async (payload: TUser) => {
     if (!result.isEmailVerified) {
         const token = createEmailToken(result.id);
         const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
-        await sendEmail(result.email, "Verify your email", `Please click on this link to verify your email: ${link}`);
+        const emailTemplate = verifyEmailTemplate(link);
+
+        await sendEmail(result.email, "Verify your email", emailTemplate);
         console.log("email send successfull")
     }
 
-    return result
+    return {}
 }
 
 
+
+
+
+
 const login = async (payload: TUser) => {
-    const result = await prisma.user.findUnique({
-        where: {
-            email: payload.email,
-            password: payload.password
-        }
-    })
+
+
+
+    const result = await prisma.user.findUnique({ where: {  email: payload.email, }})
+    if (!result) {
+        throw new AppError(401, "Invalid credentials")
+    }
+
+    const veryfy = bcrypt.compareSync(payload.password, result.password); // true
+
+    if (!veryfy) {
+        throw new AppError(401, "Invalid credentials")
+    }
+    
+    if (!result.isEmailVerified) {
+        throw new AppError(401, "Please verify your email to login")
+    }
+
     if (!result) {
         throw new Error("User not found")
     }

@@ -13,9 +13,7 @@ const register = catchAsync(async (req, res) => {
   res.status(201).json({
     status: true,
     message: "Registration successful. Please verify your email.",
-    data: {
-      user: result,
-    },
+    data: result
   })
 })
 

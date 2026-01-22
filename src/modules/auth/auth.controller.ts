@@ -24,6 +24,7 @@ const login = catchAsync(async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
+    sameSite: "none" as const,
   }
 
   res.cookie('token', token, cookieOptions)

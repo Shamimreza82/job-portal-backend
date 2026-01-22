@@ -5,10 +5,11 @@ import cors from 'cors';
 import { notFound } from './middlewares/notFound';
 import { RootRouter } from './routes/rootRouter';
 import { globalErrorHandler } from './middlewares/errorHandler';
+import seed from './lib/seed';
 
 
 const app: Application = express();
-
+seed()
 app.use(cookieParser());
 // Middleware
 app.use(cors({

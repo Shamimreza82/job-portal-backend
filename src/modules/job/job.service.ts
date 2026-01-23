@@ -23,26 +23,51 @@ import { TJobCategoryInput, TJobCreateInput } from "./job.validation"
 //   })
 //   return result
 // }
-const createJob = async (payload: TJobCreateInput) => {
+
+export const createJob = async (payload: TJobCreateInput) => {
+  // Generate a unique job ID
   const id = await generateJobId();
+  if (!id) throw new AppError(500, "Id not found");
 
-  if (!id) {
-    throw new AppError(500, "Id not found");
-  }
-
+  // Create a slug from title
   const slug = createSlug(payload.title);
+
+  // Make sure payload includes categoryId
+  if (!payload.categoryId) {
+    throw new AppError(400, "CategoryId is required");
+  }
 
   const result = await prisma.job.upsert({
     where: {
-      jobUniqueId: payload.jobUniqueId ?? id, // 👈 required unique field
+      jobUniqueId: payload.jobUniqueId ?? id,
     },
     create: {
-      ...payload,
+      title: payload.title,
+      jobRole: payload.jobRole,
+      jobType: payload.jobType,
+      salaryRange: payload.salaryRange,
+      location: payload.location,
+      expDate: new Date(payload.expDate),
+      requirSkills: payload.requirSkills,
+      responsibilities: payload.responsibilities,
+      features: payload.features,
+      requirments: payload.requirments,
+      categoryId: payload.categoryId, // 👈 must include relation ID explicitly
       jobUniqueId: id,
       slug,
     },
     update: {
-      ...payload,
+      title: payload.title,
+      jobRole: payload.jobRole,
+      jobType: payload.jobType,
+      salaryRange: payload.salaryRange,
+      location: payload.location,
+      expDate: new Date(payload.expDate),
+      requirSkills: payload.requirSkills,
+      responsibilities: payload.responsibilities,
+      features: payload.features,
+      requirments: payload.requirments,
+      categoryId: payload.categoryId, // 👈 update relation if changed
       slug,
     },
   });
@@ -51,9 +76,22 @@ const createJob = async (payload: TJobCreateInput) => {
 };
 
 
+
 const getAllJobs = async () => {
 
   const result = prisma.job.findMany()
+
+  return result
+}
+
+
+const getJobsByCategory = async (categoryId: string) => {
+
+  const result = prisma.job.findMany({
+    where: {
+      categoryId: categoryId
+    }
+  })
 
   return result
 }
@@ -93,6 +131,7 @@ const getAllCategory = async () => {
 
   const result = await prisma.jobCategory.findMany({
     select: {
+      id: true,
       title: true,
       desc: true
     }
@@ -107,5 +146,6 @@ export const JobService = {
   getAllJobs,
   createCategory,
   getAllCategory, 
-  getJobById
+  getJobById, 
+  getJobsByCategory
 }

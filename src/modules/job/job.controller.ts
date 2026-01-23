@@ -81,6 +81,17 @@ const getAllCategory = catchAsync(async (req, res) => {
     })
 })
 
+const getJobsByCategory = catchAsync(async (req, res) => {
+    const categoryId = req.params.id;
+
+    const result = await JobService.getJobsByCategory(categoryId as string);
+    res.status(200).json({
+        status: true,
+        message: "Retrive All Category by jobs Successfully",
+        statusCode: 200,
+        data: result
+    })
+})
 
 
 export const JobController = {
@@ -88,7 +99,8 @@ export const JobController = {
     getAllJobs,
     createCategory, 
     getAllCategory, 
-    getJobById
+    getJobById, 
+    getJobsByCategory
 }
 
 

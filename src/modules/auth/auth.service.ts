@@ -10,7 +10,7 @@ import bcrypt from "bcryptjs";
 import { verifyEmailTemplate } from '../../utils/emailTemplate/VerifyLink';
 import { googleOAuthClient } from '../../config/oauth';
 
-
+/////// Auth Services ////////
 
 const register = async (payload: TUser) => {
 
@@ -44,11 +44,7 @@ const register = async (payload: TUser) => {
 
     return {}
 }
-
 const login = async (payload: TUser) => {
-
-
-
     const result = await prisma.user.findUnique({ where: {  email: payload.email, }})
     if (!result) {
         throw new AppError(401, "Invalid credentials")
@@ -81,11 +77,6 @@ const login = async (payload: TUser) => {
     console.log(token)
     return { token }
 }
-
-
-
-
-
 const googleAuth = async (idToken: string) => {
 if (!idToken) {
        throw new AppError(404, "requre idToken")
@@ -137,7 +128,6 @@ if (!idToken) {
     })
     return {token}
 }
-
 const verifyEmail = async (token: string) => {
     const decoded = jwt.verify(token, process.env.EMAIL_SECRET as string) as {
         userId: string; id: string
@@ -153,9 +143,6 @@ const verifyEmail = async (token: string) => {
     });
     return { message: "Email verified successfully" };
 };
-
-
-
 const getAllUsers = async () => {
 
     const result = await prisma.user.findMany()
@@ -163,7 +150,9 @@ const getAllUsers = async () => {
 
 }
 
-/////// Profile ////////
+/////// Auth Services ////////
+
+/////// Profile Services ////////
 
 const createProfile = async (payload: TProfileInput, user: TUserPayload, avatarUrl: string | null, resumeUrl: string | null) => {
 
@@ -204,8 +193,6 @@ const createProfile = async (payload: TProfileInput, user: TUserPayload, avatarU
 
     return result;
 };
-
-
 const getSingleUser = async (payload: TUserPayload) => {
 
     const { email } = payload
@@ -223,7 +210,6 @@ const getSingleUser = async (payload: TUserPayload) => {
     })
     return result
 }
-
 const me = async (user: TUserPayload) => {
 
     const result = await prisma.user.findUnique({
@@ -240,8 +226,26 @@ const me = async (user: TUserPayload) => {
     return result
 }
 
+const createCertificate = async (user: TUserPayload, files: Express.Multer.File[], certNames: string[]) => {
+ 
+    console.log(user, files, certNames)
+    if (files.length !== certNames.length) {
+        throw new AppError(400, "Number of files and certificate names must match");
+    }   
 
 
+    // const result = await prisma.certificate.createMany({
+    //     data: {
+    //         userId: user.id,
+    //         filePath: files.map(file => file.path),
+    //         certNames: certNames,
+    //     },
+    // });    
+
+
+    // return result; 
+}
+/////// Profile Services //////
 
 export const AuthService = {
     register,
@@ -251,7 +255,8 @@ export const AuthService = {
     login,
     verifyEmail, 
     googleAuth, 
-    me
+    me, 
+    createCertificate
 }
 
 

@@ -32,13 +32,14 @@ model User {
   role            Role     @default(USER)
   createdAt       DateTime @default(now())
 
-  profile Profile?
+  profile      Profile?
+  certificates Certificate[]
 }
 
 ////// Profile //////////////////////////////
 
 model Profile {
-  id              String   @id @default(uuid())
+  id              String          @id @default(uuid())
   avatar          String?
   dob             DateTime
   address         String
@@ -51,29 +52,29 @@ model Profile {
   portfolioLink   String?
   socialLink      String[]
   resumeUpload    String?
-
-  workExperience WorkExprience[]
-  education      Education[]
-  skill          String[]
+  certificates    Certificate[]
+  workExperience  WorkExprience[]
+  education       Education[]
+  skill           String[]
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model WorkExprience {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   jobTitle        String
   companyTitle    String
   companyLocation String
   jobRole         String
   startDate       DateTime
   endDate         DateTime?
-  profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId       String
 }
 
 model Education {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   degree    String
   academy   String
   startDate DateTime
@@ -81,6 +82,17 @@ model Education {
 
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId String
+}
+
+model Certificate {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  name       String // name of the certificate
+  filePath   String // path to the uploaded file
+  uploadedAt DateTime @default(now())
+  profile    Profile? @relation(fields: [profileId], references: [id])
+  profileId  String?
 }
 
 ///// Profile ////////////////////
@@ -94,27 +106,29 @@ enum JobType {
 }
 
 model Job {
-  id               String   @id @default(uuid())
+  id               String      @id @default(uuid())
   title            String
   jobRole          String
-  jobUniqueId      String   @unique
+  jobUniqueId      String      @unique
   slug             String
   responsibilities Json
   features         Json
   requirments      Json
-  category         String
   requirSkills     String[]
   jobType          JobType
   salaryRange      String
   location         String
   expDate          DateTime
-  createdAt        DateTime @default(now())
+  createdAt        DateTime    @default(now())
+  category         JobCategory @relation(fields: [categoryId], references: [id])
+  categoryId       String
 }
 
 model JobCategory {
   id    String  @id @default(uuid())
   title String
   desc  String?
+  jobs  Job[]
 }
 
 ///// Job Post /////

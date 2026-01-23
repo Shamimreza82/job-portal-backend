@@ -29,7 +29,6 @@ export const JobSchema = z.object({
   title: z.string().min(1, "Job title is required"),     
   slug : z.string().min(1, "Slug is required").optional(),      
   jobRole: z.string().min(1, "Job role is required"),         
-  category: z.string().min(1, "Category is required"),
   jobType: JobTypeEnum,
   salaryRange: z.string().min(1, "Salary range is required"),
   location: z.string().min(1, "Location is required"),
@@ -40,6 +39,7 @@ export const JobSchema = z.object({
     .array(z.string().min(1))
     .min(1, "At least one skill is required"),
   responsibilities: z.string().min(1, "Responsibilities cannot be empty"),
+  categoryId: z.string().min(1, "Category ID is required"),
   features: z.string().min(1, "Features cannot be empty"),
   requirments: z.string().min(1, "Requirements cannot be empty"),
 });

@@ -142,7 +142,6 @@ const verifyEmail = async (token: string) => {
     });
     return { message: "Email verified successfully" };
 };
-
 const forgotPassword = async (payload: { email: string }) => {
     const { email } = payload;
 
@@ -164,11 +163,11 @@ const forgotPassword = async (payload: { email: string }) => {
         email: user.email,
     }
 
-        const token = jwt.sign(jwtPayload, process.env.JWT_SECRET || "ebdwegweuweurgweurguwer6734873457" as string, {
+    const token = jwt.sign(jwtPayload, process.env.JWT_SECRET || "ebdwegweuweurgweurguwer6734873457" as string, {
         expiresIn: "1d"
     })
 
-    const passwordresetLink = `${process.env.CLIENT_URL}/forgot-password?token=${token}&email=${user?.email}`;
+    const passwordresetLink = `${process.env.CLIENT_URL}/forgot-password?token=${token}`;
 
 
     const emailSubject = 'Your Reset Password Link';
@@ -229,40 +228,51 @@ const forgotPassword = async (payload: { email: string }) => {
 
 
 
-const resetPassword = async (payload: { token: string; newPassword: string;}) => {
-  const { newPassword, token } = payload;
+const resetPassword = async (payload: { token: string; newPassword: string }) => {
+  const { token, newPassword } = payload;
 
-const deoded = jwt.verify(token, process.env.JWT_SECRET!) ;
+  if (!newPassword || newPassword.length < 6) {
+    throw new AppError(400, "Password must be at least 6 characters long");
+  }
 
+  let email: string;
 
-//   const user = await prisma.user.findFirst({
-//     where: {
-//       OR: [
-//         { deoded.email }, 
-//       ]
-//     }
-//   });
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    ) as { email: string };
 
-//   if (!user) {
-//     throw new AppError(404, 'User not found');
-//   }
+    email = decoded.email;
+  } catch {
+    throw new AppError(401, "Invalid or expired token");
+  }
 
-  // if (!user.emailVerified) {
-  //   throw new AppError(StatusCodes.UNPROCESSABLE_ENTITY,
-  //     'Your email was not verifyed. Please verify your email before reset your password'
-  //   );
-  // }
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
 
-//   if (!user?.isActive) {
-//     throw new AppError(StatusCodes.UNPROCESSABLE_ENTITY, 'Your account is inactive. Please contact support.');
-//   }
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
 
-//   const passwordHashing = await passwordHash(newPassword);
+  if (!user.isEmailVerified) {
+    throw new AppError(400, "Please verify your email first");
+  }
 
-//   await prisma.user.update({
-//     where: { id: user.id }, // always use a unique field here
-//     data: { password: passwordHashing },
-//   });
+  if (!user.isActive) {
+    throw new AppError(403, "Your account is inactive. Contact support.");
+  }
+
+  const hashPassword = await bcrypt.hash(
+    newPassword,
+    Number(process.env.SALT_ROUNDS) || 10
+  );
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { password: hashPassword },
+  });
 
   return {};
 };
@@ -278,7 +288,7 @@ export const AuthService = {
     login,
     verifyEmail,
     googleAuth,
-    forgotPassword, 
+    forgotPassword,
     resetPassword
 }
 

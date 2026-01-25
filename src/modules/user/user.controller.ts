@@ -68,26 +68,7 @@ const createProfile = catchAsync(async (req, res) => {
     data: result
   })
 })
-const logout = catchAsync(async (req, res) => {
-  try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    });
 
-    res.status(200).json({
-      success: true,
-      message: "User logged out successfully",
-    });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Logout failed",
-    });
-  }
-});
 
 const createCertificate = catchAsync(async (req, res) => {
   const files = req.files;
@@ -110,7 +91,6 @@ const createCertificate = catchAsync(async (req, res) => {
 export const UserController = {
   createProfile,
   me,
-  logout,
   createCertificate
 }
 

@@ -72,13 +72,37 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 const resetPassword = catchAsync(async (req, res) => {
-  const result = AuthService.resetPassword(req.body)
+  const result = await AuthService.resetPassword(req.body)
+
+  console.log(result)
   res.status(201).json({
     status: true,
     message: "Your password reset successfully, please login",
     data: result,
   })
 })
+
+const logout = catchAsync(async (req, res) => {
+
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Logout failed",
+    });
+  }
+});
 ////// Auth /////////
 
 
@@ -88,7 +112,8 @@ export const AuthController = {
   verifyEmail,
   googleAuth,
   forgotPassword, 
-  resetPassword
+  resetPassword, 
+  logout
 }
 
 

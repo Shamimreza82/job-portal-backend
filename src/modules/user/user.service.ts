@@ -20,11 +20,11 @@ const createProfile = async (payload: TProfileInput, user: TUserPayload, avatarU
             ...rest,
 
             // For nested relations, you might want to replace or update existing entries
-            workExperience: {
+            workExperiences: {
                 deleteMany: {}, // optional: delete old entries
                 create: workExperience?.map((we) => ({ ...we })),
             },
-            education: {
+            educations: {
                 deleteMany: {},
                 create: education?.map((edu) => ({ ...edu })),
             },
@@ -32,10 +32,10 @@ const createProfile = async (payload: TProfileInput, user: TUserPayload, avatarU
         create: {
             ...rest,
             userId: user.id,
-            workExperience: {
+            workExperiences: {
                 create: workExperience?.map((we) => ({ ...we })),
             },
-            education: {
+            educations: {
                 create: education?.map((edu) => ({ ...edu })),
             },
         },
@@ -58,6 +58,8 @@ const me = async (user: TUserPayload) => {
     })
     return result
 }
+
+
 const createCertificate = async (user: TUserPayload, files: Express.Multer.File[], certNames: string[]) => {
  
     console.log(user, files, certNames)

@@ -3,7 +3,6 @@ import { AuthService } from "./auth.service";
 
 
 ////// Auth /////////
-
 const register = catchAsync(async (req, res) => {
 
   const result = await AuthService.register(req.body)
@@ -21,7 +20,7 @@ const login = catchAsync(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: "none" as const,
   }
 
@@ -43,7 +42,6 @@ const verifyEmail = catchAsync(async (req, res) => {
     res.redirect(`${process.env.CLIENT_URL}/profile-verified`);
   }
 })
-
 const googleAuth = catchAsync(async (req, res) => {
   const { idToken } = req.body
   const { token } = await AuthService.googleAuth(idToken)
@@ -59,8 +57,6 @@ const googleAuth = catchAsync(async (req, res) => {
     message: "User Login by Google successfully",
   })
 })
-
-
 const forgotPassword = catchAsync(async (req, res) => {
   const result = AuthService.forgotPassword(req.body)
   res.status(201).json({
@@ -70,7 +66,6 @@ const forgotPassword = catchAsync(async (req, res) => {
   })
 
 })
-
 const resetPassword = catchAsync(async (req, res) => {
   const result = await AuthService.resetPassword(req.body)
 
@@ -81,7 +76,6 @@ const resetPassword = catchAsync(async (req, res) => {
     data: result,
   })
 })
-
 const logout = catchAsync(async (req, res) => {
 
   try {

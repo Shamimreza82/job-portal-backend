@@ -9,8 +9,8 @@ import bcrypt from "bcryptjs";
 import { verifyEmailTemplate } from '../../utils/emailTemplate/VerifyLink';
 import { googleOAuthClient } from '../../config/oauth';
 
-/////// Auth Services ////////
 
+//////////// Auth Services /////////////
 const register = async (payload: TUser) => {
 
 
@@ -21,8 +21,19 @@ const register = async (payload: TUser) => {
 
 
     const isExist = await prisma.user.findUnique({ where: { email: payload.email } })
-    if (isExist) {
-        throw new AppError(404, "User already exists")
+  
+    if(isExist?.isEmailVerified){
+          throw new AppError(404, "User already veryfied. please login");
+    }
+
+    if (isExist && !isExist.isEmailVerified) {
+        const token = createEmailToken(isExist.id);
+        const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
+        const emailTemplate = verifyEmailTemplate(link);
+
+        await sendEmail(isExist.email, "Verify your email", emailTemplate);
+        console.log("email send successfull")
+        return
     }
 
 
@@ -32,21 +43,13 @@ const register = async (payload: TUser) => {
         }
     })
 
-    if (!result.isEmailVerified) {
-        const token = createEmailToken(result.id);
-        const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
-        const emailTemplate = verifyEmailTemplate(link);
-
-        await sendEmail(result.email, "Verify your email", emailTemplate);
-        console.log("email send successfull")
-    }
 
     return {}
 }
 const login = async (payload: TUser) => {
     const result = await prisma.user.findUnique({ where: { email: payload.email, } })
     if (!result) {
-        throw new AppError(401, "Invalid credentials")
+        throw new AppError(401, "User Not found")
     }
 
     const veryfy = bcrypt.compareSync(payload.password, result.password); // true
@@ -225,62 +228,55 @@ const forgotPassword = async (payload: { email: string }) => {
     return {};
 
 };
-
-
-
 const resetPassword = async (payload: { token: string; newPassword: string }) => {
-  const { token, newPassword } = payload;
+    const { token, newPassword } = payload;
 
-  if (!newPassword || newPassword.length < 6) {
-    throw new AppError(400, "Password must be at least 6 characters long");
-  }
+    if (!newPassword || newPassword.length < 6) {
+        throw new AppError(400, "Password must be at least 6 characters long");
+    }
 
-  let email: string;
+    let email: string;
 
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as { email: string };
+    try {
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET!
+        ) as { email: string };
 
-    email = decoded.email;
-  } catch {
-    throw new AppError(401, "Invalid or expired token");
-  }
+        email = decoded.email;
+    } catch {
+        throw new AppError(401, "Invalid or expired token");
+    }
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+    const user = await prisma.user.findUnique({
+        where: { email },
+    });
 
-  if (!user) {
-    throw new AppError(404, "User not found");
-  }
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
 
-  if (!user.isEmailVerified) {
-    throw new AppError(400, "Please verify your email first");
-  }
+    if (!user.isEmailVerified) {
+        throw new AppError(400, "Please verify your email first");
+    }
 
-  if (!user.isActive) {
-    throw new AppError(403, "Your account is inactive. Contact support.");
-  }
+    if (!user.isActive) {
+        throw new AppError(403, "Your account is inactive. Contact support.");
+    }
 
-  const hashPassword = await bcrypt.hash(
-    newPassword,
-    Number(process.env.SALT_ROUNDS) || 10
-  );
+    const hashPassword = await bcrypt.hash(
+        newPassword,
+        Number(process.env.SALT_ROUNDS) || 10
+    );
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { password: hashPassword },
-  });
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashPassword },
+    });
 
-  return {};
+    return {};
 };
-
-
-
-/////// Auth Services ////////
-
+///////////// Auth Services ///////////////
 
 
 export const AuthService = {

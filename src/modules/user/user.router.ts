@@ -28,6 +28,10 @@ router.post('/profile/experience',validationSchema(UserProfileValidation.workExp
 router.post('/profile/experience', auth(AuthGard.USER), UserController.createCandidateExperience)
 ///// candidate Profile /////////////
 
+/////user address /////
+router.get('/profile/personal/dropdown', UserController.dropdown)
+
+/////user address /////
 
 //////////////////Dropdown api  /////////////////////
 router.get("/profile/cascade",UserController.getDivisionWithDistrictsAndUpazilas);

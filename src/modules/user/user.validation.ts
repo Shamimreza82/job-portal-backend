@@ -87,12 +87,40 @@ export const workExperienceSchema = z.object({
 /////////// Exprience validation schema //////////////////////
 const workExperienceArraySchema = z.array(workExperienceSchema);
 
+const AddressTypeEnum = z.enum(["PRESENT", "PERMANENT"]);
+
+const AddressSchema = z.object({
+  id: z.string().uuid().optional(),
+  addressLine: z.string().min(1, "Address line is required"),
+  divisionId: z.string().uuid(),
+  districtId: z.string().uuid(),
+  upazilaId: z.string().uuid().nullable().optional(),
+  municipalityId: z.string().uuid().nullable().optional(),
+  unionParishadId: z.string().uuid().nullable().optional(),
+  policeStationId: z.string().uuid().nullable().optional(),
+  postOfficeId: z.string().uuid().nullable().optional(),
+  wardNo: z.string().nullable().optional(),
+  zipCode: z.string().nullable().optional(),
+  isCityCorporation: z.boolean().default(false),
+  isSameAsPresent: z.boolean().default(false),
+  addressTypeId: AddressTypeEnum,
+})
+
+
+
+
+
+
+
+
+
 
 
 
 export const UserProfileValidation = {
   userProfileSPersonalchema, 
-  workExperienceArraySchema
+  workExperienceArraySchema, 
+  AddressSchema
 }
 
 

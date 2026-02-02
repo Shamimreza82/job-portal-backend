@@ -27,24 +27,34 @@ const register = async (payload: TUser) => {
     throw new AppError(404, 'User already veryfied. please login');
   }
 
-  if (isExist && !isExist.isEmailVerified) {
-    const token = createEmailToken(isExist.id);
-    const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
-    const emailTemplate = verifyEmailTemplate(link);
+  // if (isExist && !isExist.isEmailVerified) {
+  //   const token = createEmailToken(isExist.id);
+  //   const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
+  //   const emailTemplate = verifyEmailTemplate(link);
 
-    await sendEmail(isExist.email, 'Verify your email', emailTemplate);
-    console.log('email send successfull');
-    return;
-  }
+  //   await sendEmail(isExist.email, 'Verify your email', emailTemplate);
+  //   console.log('email send successfull');
+  //   return;
+  // }
 
-  await prisma.user.create({
+  const result = await prisma.user.create({
     data: {
       ...payload,
     },
   });
 
+  if (!result.isEmailVerified) {
+    const token = createEmailToken(result.id);
+    const link = `${process.env.BASE_API}/auth/verify-email?token=${token}`;
+    const emailTemplate = verifyEmailTemplate(link);
+
+    await sendEmail(result.email, 'Verify your email', emailTemplate);
+    console.log('email send successfull');
+  }
+
   return {};
 };
+
 const login = async (payload: TUser) => {
   console.log(payload.recaptchaToken);
 

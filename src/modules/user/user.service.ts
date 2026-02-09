@@ -120,6 +120,7 @@ const me = async (user: TUserPayload) => {
           socialLink: true,
         },
       },
+      documents: true,
       candidateExperiences: true,
     },
   });

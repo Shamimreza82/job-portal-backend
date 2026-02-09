@@ -11,7 +11,10 @@ import { verifyEmailTemplate } from '../../utils/emailTemplate/VerifyLink';
 import { googleOAuthClient } from '../../config/oauth';
 import axios from 'axios';
 
-//////////// Auth Services /////////////
+
+
+
+/////////////////// Auth Services /////////////
 const register = async (payload: TUser) => {
   const salt = bcrypt.genSaltSync(
     process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10,
@@ -422,7 +425,13 @@ const changePassword = async (
   return {};
 };
 
+
+
+
+
 /////// Auth Services ////////
+
+
 
 export const AuthService = {
   register,

@@ -8,13 +8,15 @@ const register = catchAsync(async (req, res) => {
 
   res.status(201).json({
     status: true,
-    message: 'Registration successful. Please verify your email.',
-    data: result,
-  });
-});
-const login = catchAsync(async (req, res) => {
-  const { token } = await AuthService.login(req.body);
+    message: "Registration successful. Please verify your email.",
+    data: result
+  })
+})
 
+
+
+const login = catchAsync(async (req, res) => {
+  const { token } = await AuthService.login(req.body)
   const cookieOptions = {
     httpOnly: true,
     secure: true,
@@ -27,8 +29,10 @@ const login = catchAsync(async (req, res) => {
     status: true,
     message: 'User Login successfully',
     data: { token: token },
-  });
-});
+  })
+})
+
+
 const verifyEmail = catchAsync(async (req, res) => {
   const token = req.query.token as string;
   const result = await AuthService.verifyEmail(token);

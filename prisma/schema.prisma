@@ -423,11 +423,11 @@ model Address {
 
 model BaseDivision {
   id        Int       @id @default(autoincrement())
-  geoCode   Int       @map("geo_code")
+  geoCode   String    @map("geo_code")
   name      String    @db.VarChar(50)
   bnName    String    @map("bn_name") @db.VarChar(100)
   url       String    @db.VarChar(300)
-  status    Int       @default(1)
+  status    Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
@@ -438,14 +438,14 @@ model BaseDivision {
 
 model BaseDistrict {
   id         Int       @id @default(autoincrement())
-  geoCode    Int       @map("geo_code")
+  geoCode    String    @map("geo_code")
   divisionId Int       @map("division_id")
   name       String    @db.VarChar(50)
   bnName     String    @map("bn_name") @db.VarChar(100)
   lat        String?   @db.VarChar(50)
   lon        String?   @db.VarChar(50)
   url        String    @db.VarChar(300)
-  status     Int       @default(1)
+  status     Boolean   @default(true)
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt  DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
@@ -460,12 +460,12 @@ model BaseDistrict {
 
 model BaseUpazila {
   id         Int       @id @default(autoincrement())
-  geoCode    Int       @map("geo_code")
+  geoCode    String    @map("geo_code")
   districtId Int       @map("district_id")
   name       String    @db.VarChar(50)
   bnName     String    @map("bn_name") @db.VarChar(100)
   url        String    @db.VarChar(300)
-  status     Int       @default(1)
+  status     Boolean   @default(true)
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt  DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
@@ -475,17 +475,17 @@ model BaseUpazila {
   municipalities BaseMunicipality[]
 
   @@index([districtId])
-  @@map("base_upazila")
+  @@map("base_upazilas")
 }
 
 model BasePoliceStation {
   id         BigInt  @id @default(autoincrement())
-  geoCode    Int?    @map("geo_code") @db.SmallInt
+  geoCode    String  @map("geo_code")
   districtId Int     @map("district_id")
   name       String  @db.VarChar(75)
   bnName     String? @map("bn_name") @db.VarChar(75)
   url        String? @db.VarChar(50)
-  status     Int     @default(1)
+  status     Boolean @default(true)
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
@@ -502,13 +502,13 @@ model BasePoliceStation {
 
 model BaseUnionParishad {
   id        Int       @id @default(autoincrement())
-  geoCode   Int?      @map("geo_code")
+  geoCode   String?   @map("geo_code")
   bbsCode   Int?      @map("bbs_code")
   upazilaId Int       @map("upazila_id")
   name      String    @db.VarChar(50)
   bnName    String    @map("bn_name") @db.VarChar(100)
   url       String    @db.VarChar(300)
-  status    Int       @default(1)
+  status    Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
@@ -537,10 +537,11 @@ model BasePostOffice {
 
 model BaseMunicipality {
   id        Int       @id @default(autoincrement())
+  geoCode   String    @map("geo_code")
   upazilaId Int       @map("upazila_id")
   name      String    @db.VarChar(50)
   bnName    String    @map("bn_name") @db.VarChar(100)
-  status    Int       @default(1)
+  status    Boolean   @default(true)
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 

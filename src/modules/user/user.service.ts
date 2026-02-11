@@ -60,6 +60,34 @@ const createCandidatePersonalService = async (
   return result;
 };
 
+// const createCandidateExperienceService = async (
+//   payload: TWorkExperiece,
+//   user: TUserPayload,
+// ) => {
+//   console.log(payload);
+
+//   // Map payload to Prisma data format
+//   const experiences = payload.map((exp) => ({
+//     userId: user.id,
+//     companyName: exp.companyName,
+//     companyBusinessType: exp.companyBusinessType,
+//     location: exp.location,
+//     designation: exp.designation,
+//     isContinue: exp.isContinue,
+//     startDate: exp.startDate,
+//     endDate: exp.endDate ?? null,
+//     department: exp.department,
+//     responsibilities: exp.responsibilities ?? '',
+//   }));
+
+//   const result = await prisma.candidateExperience.createMany({
+//     data: experiences,
+//     skipDuplicates: true, // optional: skip if same record exists
+//   });
+
+//   return result;
+// };
+
 const createCandidateExperienceService = async (
   payload: TWorkExperiece,
   user: TUserPayload,
@@ -73,11 +101,9 @@ const createCandidateExperienceService = async (
     companyBusinessType: exp.companyBusinessType,
     location: exp.location,
     designation: exp.designation,
-    isContinue: exp.isContinue,
     startDate: exp.startDate,
-    endDate: exp.endDate ?? null,
+    endDate: exp.endDate,
     department: exp.department,
-    responsibilities: exp.responsibilities ?? '',
   }));
 
   const result = await prisma.candidateExperience.createMany({

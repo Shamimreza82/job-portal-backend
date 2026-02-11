@@ -174,7 +174,7 @@ model CandidateExperience {
   isContinue          Boolean?  @default(false) @map("is_continue")
   startDate           DateTime  @map("start_date")
   endDate             DateTime? @map("end_date")
-  responsibilities    String
+  // responsibilities    String
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -183,7 +183,7 @@ model CandidateExperience {
   updatedAt DateTime   @updatedAt @map("updated_at")
   documents Document[]
 
-  @@unique([userId, companyName, designation])
+  @@unique([userId, companyName, designation, department, companyBusinessType])
   @@map("candidate_experiences")
 }
 

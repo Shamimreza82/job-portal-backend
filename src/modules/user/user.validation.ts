@@ -60,7 +60,7 @@ export const workExperienceSchema = z
 
     isContinue: z.boolean(),
 
-    // responsibilities: z.string().optional(),
+    responsibilities: z.string().optional(),
 
     startDate: z
       .string()

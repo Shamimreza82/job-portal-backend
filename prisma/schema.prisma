@@ -193,19 +193,20 @@ model CandidateExperience {
 ///////////////////////////////////  Candidate References ///////////////////////////////////////////
 
 model CandidateReference {
-  id           String   @id @default(uuid())
+  id String @id @default(uuid())
 
   name         String
+  companyName  String
   designation  String
   phone        String
-  emailAddress String   @map("email_address")
+  emailAddress String @map("email_address")
   relationship String
 
-  userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("candidate_references")
 }
@@ -326,7 +327,6 @@ model CandidateRefrance {
 
   @@map("Candidate_refrances")
 }
-
 
 model BaseDivision {
   id        Int       @id @default(autoincrement())
@@ -461,8 +461,6 @@ model BaseMunicipality {
 ////////////////////////////////////////////////////////////////////////  Candidate Address ////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////  Candidate Education Dropdown ////////////////////////////////////////////////////////////////////////
-
-
 
 // model Division {
 //   id        String   @id @default(uuid())

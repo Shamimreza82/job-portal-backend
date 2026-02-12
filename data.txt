@@ -13,14 +13,14 @@ INSERT INTO religions (id, name) VALUES
 
  -- blood_groups
 INSERT INTO blood_groups (id, name) VALUES
-(gen_random_uuid(), 'A+'),
-(gen_random_uuid(), 'A-'),
-(gen_random_uuid(), 'B+'),
-(gen_random_uuid(), 'B-'),
-(gen_random_uuid(), 'AB+'),
-(gen_random_uuid(), 'AB-'),
-(gen_random_uuid(), 'O+'),
-(gen_random_uuid(), 'O-');
+(gen_random_uuid(), 'A(+ve)'),
+(gen_random_uuid(), 'A(-ve)'),
+(gen_random_uuid(), 'B(+ve)'),
+(gen_random_uuid(), 'B(-ve)'),
+(gen_random_uuid(), 'AB(+ve)'),
+(gen_random_uuid(), 'AB(-ve)'),
+(gen_random_uuid(), 'O(+ve)'),
+(gen_random_uuid(), 'O(-ve)');
 
 
  -- skills

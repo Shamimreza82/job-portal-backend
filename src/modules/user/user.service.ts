@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from '../../config/prisma';
 import { TUserPayload } from '../../types/user';
-import { TCanditateProfile, TReferance, TWorkExperiece } from './user.validation';
+import {
+  TCanditateProfile,
+  TReferance,
+  TWorkExperiece,
+} from './user.validation';
 
 //////////////////////////////////////// Profile Services /////////////////////////////////////////////
 
@@ -62,7 +66,7 @@ const createCandidatePersonalService = async (
 
 const createCandidateExperienceService = async (
   payload: TWorkExperiece,
-  user: TUserPayload
+  user: TUserPayload,
 ) => {
   const userId = user.id;
 
@@ -84,14 +88,14 @@ const createCandidateExperienceService = async (
         startDate: new Date(exp.startDate),
         endDate: exp.endDate ? new Date(exp.endDate) : null,
         department: exp.department,
-        responsibilities: exp.responsibilities ?? "",
+        responsibilities: exp.responsibilities ?? '',
       })),
     });
 
     // 3️⃣ Return updated list
     return tx.candidateExperience.findMany({
       where: { userId },
-      orderBy: { startDate: "desc" },
+      orderBy: { startDate: 'desc' },
     });
   });
 
@@ -209,7 +213,6 @@ const me = async (user: TUserPayload) => {
 //   }
 // };
 
-
 const createCandidateEducationService = async (
   payload: any,
   user: TUserPayload,
@@ -228,8 +231,10 @@ const createCandidateEducationService = async (
   return result;
 };
 
-
-const createCandidateReference = async (payload: TReferance[],  user: TUserPayload) => {
+const createCandidateReference = async (
+  payload: TReferance[],
+  user: TUserPayload,
+) => {
   const userId = user.id;
 
   const result = await prisma.$transaction(async (tx) => {
@@ -241,12 +246,13 @@ const createCandidateReference = async (payload: TReferance[],  user: TUserPaylo
     // 2️⃣ Insert new references
     const created = await tx.candidateReference.createMany({
       data: payload.map((ref) => ({
+        userId,
         name: ref.name,
+        companyName: ref.companyName,
         designation: ref.designation,
         phone: ref.phone,
         emailAddress: ref.emailAddress,
         relationship: ref.relationship,
-        userId,
       })),
     });
 
@@ -255,9 +261,6 @@ const createCandidateReference = async (payload: TReferance[],  user: TUserPaylo
 
   return result;
 };
-
-
-
 
 export const UserService = {
   createCandidatePersonalService,

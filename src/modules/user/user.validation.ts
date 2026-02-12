@@ -108,45 +108,42 @@ const AddressSchema = z.object({
   addressTypeId: AddressTypeEnum,
 });
 
-
 export const referenceSchema = z.object({
   name: z
     .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name is too long"),
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name is too long'),
+
+  companyName: z
+    .string()
+    .min(2, 'Company name must be at least 2 characters')
+    .max(100, 'Company name is too long'),
 
   designation: z
     .string()
-    .min(2, "Designation must be at least 2 characters")
-    .max(100, "Designation is too long"),
+    .min(2, 'Designation must be at least 2 characters')
+    .max(100, 'Designation is too long'),
 
   phone: z
     .string()
-    .min(6, "Phone number is too short")
-    .max(20, "Phone number is too long"),
+    .min(6, 'Phone number is too short')
+    .max(20, 'Phone number is too long'),
 
-  emailAddress: z
-    .string()
-    .email("Invalid email address"),
+  emailAddress: z.string().email('Invalid email address'),
 
   relationship: z
     .string()
-    .min(2, "Relationship must be at least 2 characters")
-    .max(100, "Relationship is too long"),
+    .min(2, 'Relationship must be at least 2 characters')
+    .max(100, 'Relationship is too long'),
 });
 
 const ReferanceArraySchema = z.array(referenceSchema);
 
-
-
-
-
-
 export const UserProfileValidation = {
   userProfileSPersonalchema,
   workExperienceArraySchema,
-  AddressSchema,  
-  ReferanceArraySchema
+  AddressSchema,
+  ReferanceArraySchema,
 };
 
 // TypeScript type inferred from Zod

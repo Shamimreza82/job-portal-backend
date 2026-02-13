@@ -29,11 +29,12 @@ router.post('/profile/education', auth(AuthGard.USER), UserController.createCand
 
 
 
-router.post('/profile/refarance', auth(AuthGard.USER), validationSchema(UserProfileValidation.ReferanceArraySchema), UserController.createCandidateRefrance)
+router.post('/profile/refarance', auth(AuthGard.USER),  UserController.createCandidateRefrance)
 
 
 /////user address /////
 router.get('/profile/personal/dropdown', UserController.dropdown)
+router.get('/profile/address/dropdown', UserController.getAddressDropdown)
 
 /////user address /////
 

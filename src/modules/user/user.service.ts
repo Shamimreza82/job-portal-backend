@@ -263,6 +263,36 @@ const createCandidateReference = async (
   return result;
 };
 
+const getAddressDropdown = async () => {
+  const divisions = await prisma.division.findMany({
+    select: { id: true, name: true },
+  });
+  const districts = await prisma.district.findMany({
+    select: { id: true, name: true },
+  });
+  const upazilas = await prisma.upazila.findMany({
+    select: { id: true, name: true },
+  });
+  const policeStations = await prisma.policeStation.findMany({
+    select: { id: true, bnName: true },
+  });
+  const municipalities = await prisma.municipality.findMany({
+    select: { id: true, name: true },
+  });
+  const unionParishads = await prisma.unionParishad.findMany({
+    select: { id: true, name: true },
+  });
+
+  return {
+    divisions,
+    districts,
+    upazilas,
+    policeStations,
+    municipalities,
+    unionParishads,
+  };
+};
+
 export const UserService = {
   createCandidatePersonalService,
   createCandidateExperienceService,
@@ -271,4 +301,5 @@ export const UserService = {
   dropdown,
   createCandidateEducationService,
   createCandidateReference,
+  getAddressDropdown
 };

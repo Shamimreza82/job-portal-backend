@@ -76,6 +76,19 @@ const createCandidateRefrance = catchAsync(async (req, res) => {
   });
 });
 
+
+
+
+
+const getAddressDropdown = catchAsync(async (req, res) => {
+  const result = await UserService.getAddressDropdown();
+  res.status(201).json({
+    status: true,
+    message: 'get all address dropdown successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createCandidatePersonal,
   createCandidateExperience,
@@ -86,4 +99,5 @@ export const UserController = {
   dropdown,
   createCandidateEducation,
   createCandidateRefrance,
+  getAddressDropdown
 };

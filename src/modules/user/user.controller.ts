@@ -77,8 +77,6 @@ const createCandidateRefrance = catchAsync(async (req, res) => {
   });
 });
 
-
-
 const createCandidateAddress = catchAsync(async (req, res) => {
   const result = await UserService.createCandidateAddress(
     req.body,
@@ -91,10 +89,6 @@ const createCandidateAddress = catchAsync(async (req, res) => {
   });
 } );
   
-
-
-
-
 const getAddressDropdown = catchAsync(async (req, res) => {
   const result = await UserService.getAddressDropdown();
   res.status(201).json({
@@ -118,6 +112,21 @@ const getDivisionWithDistrictsAndUpazilas = catchAsync(async (req, res) => {
   });
 });
 
+const createCandidateAchievement = catchAsync(async (req, res) => {
+  const result = await UserService.createCandidateAchievement(
+    req.body,
+    req.user as TUserPayload,
+  );
+  res.status(201).json({
+    status: true,
+    message: 'Created user Achievement successfully',
+    data: result,
+  });
+} );
+
+
+
+
 export const UserController = {
   createCandidatePersonal,
   createCandidateExperience,
@@ -129,5 +138,6 @@ export const UserController = {
   createCandidateEducation,
   createCandidateRefrance,
   getAddressDropdown, 
-  createCandidateAddress
+  createCandidateAddress, 
+  createCandidateAchievement
 };

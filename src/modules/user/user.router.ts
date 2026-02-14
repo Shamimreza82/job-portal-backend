@@ -4,7 +4,7 @@ import express from "express";
 // import { uploadBystorage } from '../../utils/upload';
 import { UserController } from './user.controller';
 import { validationSchema } from '../../middlewares/validationSchema';
-import { UserProfileValidation } from './user.validation';
+import { achievementSchema, multipleAchievementSchema, UserProfileValidation } from './user.validation';
 
 // import { validationSchema } from '../../middlewares/validationSchema';
 // import { profileSchema } from './user.validation';
@@ -27,6 +27,7 @@ router.post('/profile/personal', validationSchema(UserProfileValidation.userProf
 router.post('/profile/experience',validationSchema(UserProfileValidation.workExperienceArraySchema), auth(AuthGard.USER), UserController.createCandidateExperience)
 router.post('/profile/education', auth(AuthGard.USER), UserController.createCandidateEducation)
 router.post('/profile/refarance', auth(AuthGard.USER),  UserController.createCandidateRefrance)
+router.post('/profile/achievemen', auth(AuthGard.USER), validationSchema(multipleAchievementSchema), UserController.createCandidateAchievement)
 router.post('/profile/address', auth(AuthGard.USER), UserController.createCandidateAddress)
 
 

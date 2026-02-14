@@ -2,6 +2,7 @@
 import { prisma } from '../../config/prisma';
 import { TUserPayload } from '../../types/user';
 import {
+  TAchievementInput,
   TAddressInput,
   TCanditateProfile,
   TReferance,
@@ -290,8 +291,6 @@ const getAddressDropdown = async () => {
   };
 };
 
-
-
 const createCandidateAddress = async (
   payload: TAddressInput[],
   user: TUserPayload,
@@ -329,6 +328,40 @@ const createCandidateAddress = async (
 };
 
 
+const createCandidateAchievement = async (
+  payload: TAchievementInput[],
+  user: TUserPayload,
+) => {
+  const userId = user.id;
+
+
+  console.log(payload)
+  const result = await prisma.$transaction(async (tx) => {
+    // Delete old achievements
+    await tx.candidateAchievement.deleteMany({
+      where: { userId },
+    });
+
+    // Create new ones
+    const created = await tx.candidateAchievement.createMany({
+      data: payload.map((item) => ({
+        userId,
+        type: item.type,
+        title: item.title,
+        description: item.description,
+        organizationName: item.organizationName,
+        url: item.url,
+        location: item.location,
+        year: item.year,
+      })),
+    });
+
+    return created;
+  });
+
+  return result;
+};
+
 
 
 
@@ -342,5 +375,6 @@ export const UserService = {
   createCandidateEducationService,
   createCandidateReference,
   getAddressDropdown, 
-  createCandidateAddress
+  createCandidateAddress, 
+  createCandidateAchievement
 };

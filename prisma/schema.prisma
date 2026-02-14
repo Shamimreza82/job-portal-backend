@@ -21,23 +21,24 @@ enum Role {
 }
 
 model User {
-  id                   String                @id @default(uuid())
-  fullName             String?               @map("full_name")
-  email                String                @unique
-  phone                String?               @unique
-  isActive             Boolean               @default(true) @map("is_active")
-  isEmailVerified      Boolean               @default(false) @map("is_email_verified")
-  password             String
-  role                 Role                  @default(USER)
-  createdAt            DateTime              @default(now()) @map("created_at")
-  candidatePersonal    CandidatePersonal? ////done 
-  candidateEducations  CandidateEducation[]
-  candidateExperiences CandidateExperience[]
-  candidateReferences  CandidateReference[]
-  candidateLanguages   CandidateLanguage[]
-  addresses            Address[]
-  documents            Document[]
-  candidateRefrance    CandidateRefrance[]
+  id                    String                 @id @default(uuid())
+  fullName              String?                @map("full_name")
+  email                 String                 @unique
+  phone                 String?                @unique
+  isActive              Boolean                @default(true) @map("is_active")
+  isEmailVerified       Boolean                @default(false) @map("is_email_verified")
+  password              String
+  role                  Role                   @default(USER)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  candidatePersonal     CandidatePersonal? ////done 
+  candidateEducations   CandidateEducation[]
+  candidateExperiences  CandidateExperience[]
+  candidateReferences   CandidateReference[]
+  candidateLanguages    CandidateLanguage[]
+  candidateRefrance     CandidateRefrance[]
+  candidateAchievements CandidateAchievement[]
+  addresses             Address[]
+  documents             Document[]
 
   @@index([id, email])
   @@map("users")
@@ -228,7 +229,6 @@ model CandidateLanguage {
   @@map("candidate_languages")
 }
 
-
 model CandidateRefrance {
   id           String @id @default(uuid())
   name         String
@@ -246,7 +246,38 @@ model CandidateRefrance {
   @@map("Candidate_refrances")
 }
 
+enum AchievementType {
+  PROFESSIONAL_CERTIFICATION
+  TRAINING
+  WORKSHOP
+  SEMINAR
+  AWARD
+  HONOR
+  COMPETITION
+  PUBLICATION
+  PROJECT
+  OTHER
+}
 
+model CandidateAchievement {
+  id String @id @default(uuid())
+
+  type             AchievementType
+  title            String
+  organizationName String          @map("organization_name")
+  url              String?
+  location         String
+  year             Int
+  description      String          
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("candidate_achievements")
+}
 
 ///////////////////////////////////  Candidate Language ///////////////////////////////////////////
 
@@ -265,6 +296,10 @@ model Document {
 
   type                  DocumentType
   name                  String? // Certificate name or custom file name
+  documentNo            String?              @map("document_no")
+  issueDate             DateTime?            @map("issue_date")
+  issueAuthority        String?              @map("issue_authority")
+  remarks               String?
   path                  String
   size                  Int
   mimeType              String               @map("mime_type")
@@ -278,7 +313,7 @@ model Document {
   candidateEducationId String?             @map("candidate_education_id")
   candidateEducation   CandidateEducation? @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, type, name]) // prevents duplicate certificate names per user
+  @@unique([userId, name], name: "userId_name") // prevents duplicate certificate names per user
   @@index([userId])
   @@map("documents")
 }
@@ -287,9 +322,6 @@ model Document {
 
 ///////////////////////////////////  Candidate Address ///////////////////////////////////////////
 
-
-
-/////////////////////////////////////////////////////////// Get divisition  /////////////////////////////////////
 model AddressType {
   id        String          @id @default(uuid())
   name      AddressTypeEnum
@@ -303,29 +335,28 @@ enum AddressTypeEnum {
   PERMANENT
 }
 
-
 model Address {
   id String @id @default(uuid())
 
-  addressLine String
+  addressLine String @map("address_line")
 
-  divisionId String
-  districtId String     
-  upazilaId  String
+  divisionId String @map("division_id")
+  districtId String @map("district_id")
+  upazilaId  String @map("upazila_id")
 
-  municipalityId  String?
-  unionParishadId String?
-  policeStationId String?
-  postOfficeId    String?
+  municipalityId  String? @map("municipality_id")
+  unionParishadId String? @map("union_parishad_id")
+  policeStationId String? @map("police_station_id")
+  postOfficeId    String? @map("post_office_id")
 
-  wardNo  String?
-  zipCode String?
+  wardNo  String? @map("ward_no")
+  zipCode String? @map("zip_code")
 
-  isCityCorporation Boolean @default(false)
-  isSameAsPresent   Boolean @default(false)
+  isCityCorporation Boolean @default(false) @map("is_city_corporation")
+  isSameAsPresent   Boolean @default(false) @map("is_same_as_present")
 
-  userId        String
-  addressTypeId String
+  userId        String @map("user_id")
+  addressTypeId String @map("address_type_id")
 
   user        User        @relation(fields: [userId], references: [id])
   addressType AddressType @relation(fields: [addressTypeId], references: [id])
@@ -333,7 +364,6 @@ model Address {
   @@unique([userId, addressTypeId])
   @@map("address")
 }
-
 
 model BaseDivision {
   id        Int       @id @default(autoincrement())
@@ -463,118 +493,3 @@ model BaseMunicipality {
 }
 
 ////////////////////////////////////////////////////////////////////////  Candidate Address ////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////  Candidate Education Dropdown ////////////////////////////////////////////////////////////////////////
-
-// model Division {
-//   id        String   @id @default(uuid())
-//   geoCode   String?  @map("geo_code")
-//   name      String
-//   bnName    String?  @map("bn_name")
-//   url       String?
-//   status    Boolean  @default(true)
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-
-//   districts District[]
-
-//   @@map("divisions")
-// }
-
-// model District {
-//   id         String   @id @default(uuid())
-//   divisionId String   @map("division_id")
-//   geoCode    String?  @map("geo_code")
-//   name       String
-//   bnName     String?  @map("bn_name")
-//   lat        Float?
-//   lon        Float?
-//   url        String?
-//   status     Boolean  @default(true)
-//   createdAt  DateTime @default(now()) @map("created_at")
-//   updatedAt  DateTime @updatedAt @map("updated_at")
-
-//   division       Division        @relation(fields: [divisionId], references: [id])
-//   upazilas       Upazila[]
-//   policeStations PoliceStation[]
-//   postOffices    PostOffice[]
-
-//   @@map("districts")
-// }
-
-// model Upazila {
-//   id         String   @id @default(uuid())
-//   districtId String   @map("district_id")
-//   geoCode    String?  @map("geo_code")
-//   name       String
-//   bnName     String?  @map("bn_name")
-//   url        String?
-//   status     Boolean  @default(true)
-//   createdAt  DateTime @default(now()) @map("created_at")
-//   updatedAt  DateTime @updatedAt @map("updated_at")
-
-//   district       District        @relation(fields: [districtId], references: [id])
-//   municipalities Municipality[]
-//   unions         UnionParishad[]
-//   postOffices    PostOffice[]
-
-//   @@map("upazilas")
-// }
-
-// model Municipality {
-//   id        String   @id @default(uuid())
-//   upazilaId String   @map("upazila_id")
-//   name      String
-//   bnName    String?  @map("bn_name")
-//   status    Boolean  @default(true)
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-
-//   upazila Upazila @relation(fields: [upazilaId], references: [id])
-
-//   @@map("municipalities")
-// }
-
-// model UnionParishad {
-//   id        String   @id @default(uuid())
-//   upazilaId String   @map("upazila_id")
-//   name      String
-//   bnName    String?  @map("bn_name")
-//   status    Boolean  @default(true)
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
-
-//   upazila Upazila @relation(fields: [upazilaId], references: [id])
-
-//   @@map("union_parishads")
-// }
-
-// model PoliceStation {
-//   id         String   @id @default(uuid())
-//   districtId String   @map("district_id")
-//   geoCode    String?  @map("geo_code")
-//   url        String?
-//   bnName     String?  @map("bn_name")
-//   status     Boolean  @default(true)
-//   createdAt  DateTime @default(now()) @map("created_at")
-//   updatedAt  DateTime @updatedAt @map("updated_at")
-
-//   district District @relation(fields: [districtId], references: [id])
-
-//   @@map("police_stations")
-// }
-
-// model PostOffice {
-//   id         String   @id @default(uuid())
-//   districtId String   @map("district_id")
-//   upazilaId  String   @map("upazila_id")
-//   postOffice String   @map("post_office")
-//   postCode   String   @map("post_code")
-//   createdAt  DateTime @default(now()) @map("created_at")
-//   updatedAt  DateTime @updatedAt @map("updated_at")
-
-//   district District @relation(fields: [districtId], references: [id])
-//   upazila  Upazila  @relation(fields: [upazilaId], references: [id])
-
-//   @@map("post_offices")
-// }

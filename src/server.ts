@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
 import app from './app';
 import { config } from './config';
 import { logger } from './middlewares/logger';
-
 
 // Start server
 const main = async () => {

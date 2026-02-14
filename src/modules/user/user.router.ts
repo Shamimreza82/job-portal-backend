@@ -5,7 +5,7 @@ import express from 'express';
 import { UserController } from './user.controller';
 import { validationSchema } from '../../middlewares/validationSchema';
 import {
-  achievementSchema,
+  //   achievementSchema,
   multipleAchievementSchema,
   UserProfileValidation,
 } from './user.validation';

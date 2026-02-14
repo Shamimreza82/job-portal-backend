@@ -1,4 +1,3 @@
-import { TAchievementInput } from './user.validation';
 import { z } from 'zod';
 
 /////////// personal validation schema //////////////////////
@@ -140,7 +139,6 @@ export const referenceSchema = z.object({
 
 const ReferanceArraySchema = z.array(referenceSchema);
 
-
 /**
  * Address Type Enum
  */
@@ -151,13 +149,20 @@ export const addressTypeEnum = z.enum(['PRESENT', 'PERMANENT']);
  */
 export const addressSchema = z
   .object({
-    addressLine: z
-      .string()
-      .min(5, 'Address must be at least 5 characters'),
+    addressLine: z.string().min(5, 'Address must be at least 5 characters'),
 
-    divisionId: z.string().uuid().min(1, 'Division ID must be at least 5 characters'),
-    districtId: z.string().uuid().min(1, 'District ID must be at least 5 characters'),
-    upazilaId: z.string().uuid().min(1, 'Upazila ID must be at least 5 characters'),
+    divisionId: z
+      .string()
+      .uuid()
+      .min(1, 'Division ID must be at least 5 characters'),
+    districtId: z
+      .string()
+      .uuid()
+      .min(1, 'District ID must be at least 5 characters'),
+    upazilaId: z
+      .string()
+      .uuid()
+      .min(1, 'Upazila ID must be at least 5 characters'),
 
     municipalityId: z.string().uuid().optional().nullable(),
     unionParishadId: z.string().uuid().optional().nullable(),
@@ -184,7 +189,7 @@ export const addressSchema = z
     {
       message: 'Municipality is required when city corporation is true',
       path: ['municipalityId'],
-    }
+    },
   );
 
 /**
@@ -192,18 +197,17 @@ export const addressSchema = z
  */
 export const multipleAddressSchema = z.array(addressSchema).min(1);
 
-
 export const achievementTypeEnum = z.enum([
-  "PROFESSIONAL_CERTIFICATION",
-  "TRAINING",
-  "WORKSHOP",
-  "SEMINAR",
-  "AWARD",
-  "HONOR",
-  "COMPETITION",
-  "PUBLICATION",
-  "PROJECT",
-  "OTHER",
+  'PROFESSIONAL_CERTIFICATION',
+  'TRAINING',
+  'WORKSHOP',
+  'SEMINAR',
+  'AWARD',
+  'HONOR',
+  'COMPETITION',
+  'PUBLICATION',
+  'PROJECT',
+  'OTHER',
 ]);
 
 export const achievementSchema = z.object({
@@ -211,47 +215,28 @@ export const achievementSchema = z.object({
 
   title: z
     .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(150, "Title is too long"),
+    .min(3, 'Title must be at least 3 characters')
+    .max(150, 'Title is too long'),
 
-  organizationName: z
-    .string()
-    .min(2, "Organization name is required")
-    .max(120),
+  organizationName: z.string().min(2, 'Organization name is required').max(120),
 
-  url: z
-    .string()
-    .url("Invalid URL")
-    .optional()
-    .or(z.literal("")),
+  url: z.string().url('Invalid URL').optional().or(z.literal('')),
 
-  location: z
-    .string()
-    .min(2, "Location is required")
-    .max(100),
+  location: z.string().min(2, 'Location is required').max(100),
 
   year: z
     .number()
     .int()
-    .gte(1950, "Invalid year")
-    .lte(new Date().getFullYear(), "Year cannot be in the future"),
+    .gte(1950, 'Invalid year')
+    .lte(new Date().getFullYear(), 'Year cannot be in the future'),
 
   description: z
     .string()
-    .min(10, "Description must be at least 10 characters")
+    .min(10, 'Description must be at least 10 characters')
     .max(2000),
 });
 
 export const multipleAchievementSchema = z.array(achievementSchema).min(1);
-
-
-
-
-
-
-
-
-
 
 export const UserProfileValidation = {
   userProfileSPersonalchema,
@@ -259,22 +244,8 @@ export const UserProfileValidation = {
   AddressSchema,
   ReferanceArraySchema,
   addressSchema,
-  multipleAchievementSchema
+  multipleAchievementSchema,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // TypeScript type inferred from Zod
 export type TCanditateProfile = z.infer<typeof userProfileSPersonalchema>;
@@ -290,5 +261,4 @@ export type TMultipleAddressInput = z.infer<typeof multipleAddressSchema>;
 // Address Type Enum
 export type TAddressType = z.infer<typeof addressTypeEnum>;
 export type TAchievementInput = z.infer<typeof achievementSchema>;
-export type TAchievementEnum = z.infer<typeof achievementTypeEnum>
-
+export type TAchievementEnum = z.infer<typeof achievementTypeEnum>;

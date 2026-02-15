@@ -174,7 +174,7 @@ const getDivisionWithDistrictsAndUpazilas = async (payload: {
       return { level: 'district', data: districts };
     }
 
-    // 3️⃣ District selected → return upazilas + police stations
+    // 3️⃣ District selected → return upazilas + police stations + post offices + city corporations
     if (districtId && !upazilaId) {
       const upazilas = await prisma.baseUpazila.findMany({
         where: { districtId: Number(districtId) },
@@ -188,7 +188,17 @@ const getDivisionWithDistrictsAndUpazilas = async (payload: {
         where: { districtId: Number(districtId) },
         select: { id: true, postOffice: true, postCode: true },
       });
-      return { level: 'upazila', upazilas, policeStations, postOffices };
+      const cityCorporations = await prisma.baseCityCorporation.findMany({
+        where: { districtId: Number(districtId) },
+        select: { id: true, name: true },
+      });
+      return {
+        level: 'upazila , police station, post office, city corporation',
+        upazilas,
+        policeStations,
+        postOffices,
+        cityCorporations,
+      };
     }
 
     // 4️⃣ Upazila selected → return municipalities, unions, post offices
@@ -279,6 +289,9 @@ const getAddressDropdown = async () => {
   const upazilas = await prisma.baseUpazila.findMany({
     select: { id: true, name: true },
   });
+  const cityCorporations = await prisma.baseCityCorporation.findMany({
+    select: { id: true, name: true },
+  });
   const policeStations = await prisma.basePoliceStation.findMany({
     select: { id: true, bnName: true },
   });
@@ -293,6 +306,7 @@ const getAddressDropdown = async () => {
     divisions,
     districts,
     upazilas,
+    cityCorporations,
     policeStations,
     municipalities,
     unionParishads,

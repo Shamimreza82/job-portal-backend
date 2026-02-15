@@ -90,7 +90,7 @@ const createCandidateAddress = catchAsync(async (req, res) => {
 
 const getAddressDropdown = catchAsync(async (req, res) => {
   const result = await UserService.getAddressDropdown();
-  res.status(201).json({
+  res.status(200).json({
     status: true,
     message: 'get all address dropdown successfully',
     data: result,
@@ -105,7 +105,7 @@ const getDivisionWithDistrictsAndUpazilas = catchAsync(async (req, res) => {
   };
 
   const result = await UserService.getDivisionWithDistrictsAndUpazilas(query);
-  res.status(201).json({
+  res.status(200).json({
     status: true,
     message: 'get all division/district/upazila successfully',
     data: result,

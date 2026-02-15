@@ -35,7 +35,6 @@ model User {
   candidateExperiences  CandidateExperience[]
   candidateReferences   CandidateReference[]
   candidateLanguages    CandidateLanguage[]
-  candidateReference    CandidateReference[]
   candidateAchievements CandidateAchievement[]
   addresses             Address[]
   documents             Document[]
@@ -376,13 +375,29 @@ model BaseDistrict {
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt  DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
-  division       BaseDivision        @relation(fields: [divisionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  upazilas       BaseUpazila[]
-  policeStations BasePoliceStation[]
-  postOffices    BasePostOffice[]
+  division             BaseDivision          @relation(fields: [divisionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  upazilas             BaseUpazila[]
+  policeStations       BasePoliceStation[]
+  postOffices          BasePostOffice[]
+  baseCityCorporations BaseCityCorporation[]
 
   @@index([divisionId])
   @@map("base_districts")
+}
+
+model BaseCityCorporation {
+  id         Int       @id @default(autoincrement())
+  districtId Int       @map("district_id")
+  name       String    @db.VarChar(50)
+  bnName     String    @map("bn_name") @db.VarChar(100)
+  status     Boolean   @default(true)
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  district BaseDistrict @relation(fields: [districtId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([districtId])
+  @@map("base_city_corporations")
 }
 
 model BaseUpazila {

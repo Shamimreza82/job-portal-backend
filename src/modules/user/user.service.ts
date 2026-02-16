@@ -289,39 +289,6 @@ const createCandidateReference = async (
   return result;
 };
 
-const getAddressDropdown = async () => {
-  const divisions = await prisma.baseDivision.findMany({
-    select: { id: true, name: true },
-  });
-  const districts = await prisma.baseDistrict.findMany({
-    select: { id: true, name: true },
-  });
-  const upazilas = await prisma.baseUpazila.findMany({
-    select: { id: true, name: true },
-  });
-  const cityCorporations = await prisma.baseCityCorporation.findMany({
-    select: { id: true, name: true },
-  });
-  const policeStations = await prisma.basePoliceStation.findMany({
-    select: { id: true, bnName: true },
-  });
-  const municipalities = await prisma.baseMunicipality.findMany({
-    select: { id: true, name: true },
-  });
-  const unionParishads = await prisma.baseUnionParishad.findMany({
-    select: { id: true, name: true },
-  });
-
-  return {
-    divisions,
-    districts,
-    upazilas,
-    cityCorporations,
-    policeStations,
-    municipalities,
-    unionParishads,
-  };
-};
 
 const createCandidateAddress = async (
   payload: TAddressInput[],
@@ -399,7 +366,6 @@ export const UserService = {
   dropdown,
   createCandidateEducationService,
   createCandidateReference,
-  getAddressDropdown,
   createCandidateAddress,
   createCandidateAchievement,
 };

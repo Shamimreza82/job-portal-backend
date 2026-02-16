@@ -2,6 +2,9 @@
 CREATE TYPE "Role" AS ENUM ('HR', 'USER', 'ADMIN', 'MODERATOR');
 
 -- CreateEnum
+CREATE TYPE "AchievementType" AS ENUM ('PROFESSIONAL_CERTIFICATION', 'TRAINING', 'WORKSHOP', 'SEMINAR', 'AWARD', 'HONOR', 'COMPETITION', 'PUBLICATION', 'PROJECT', 'OTHER');
+
+-- CreateEnum
 CREATE TYPE "DocumentType" AS ENUM ('AVATAR', 'RESUME', 'SIGNATURE', 'CERTIFICATE', 'OTHER');
 
 -- CreateEnum
@@ -166,18 +169,20 @@ CREATE TABLE "candidate_languages" (
 );
 
 -- CreateTable
-CREATE TABLE "Candidate_references" (
+CREATE TABLE "candidate_achievements" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "designation" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
-    "email_address" TEXT NOT NULL,
-    "relationship" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "type" "AchievementType" NOT NULL,
+    "title" TEXT NOT NULL,
+    "organization_name" TEXT NOT NULL,
+    "url" TEXT,
+    "location" TEXT NOT NULL,
+    "year" INTEGER NOT NULL,
+    "description" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Candidate_references_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "candidate_achievements_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -185,6 +190,10 @@ CREATE TABLE "documents" (
     "id" TEXT NOT NULL,
     "type" "DocumentType" NOT NULL,
     "name" TEXT,
+    "document_no" TEXT,
+    "issue_date" TIMESTAMP(3),
+    "issue_authority" TEXT,
+    "remarks" TEXT,
     "path" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
     "mime_type" TEXT NOT NULL,
@@ -207,20 +216,21 @@ CREATE TABLE "address_types" (
 -- CreateTable
 CREATE TABLE "address" (
     "id" TEXT NOT NULL,
-    "addressLine" TEXT NOT NULL,
-    "divisionId" TEXT NOT NULL,
-    "districtId" TEXT NOT NULL,
-    "upazilaId" TEXT NOT NULL,
-    "municipalityId" TEXT,
-    "unionParishadId" TEXT,
-    "policeStationId" TEXT,
-    "postOfficeId" TEXT,
-    "wardNo" TEXT,
-    "zipCode" TEXT,
-    "isCityCorporation" BOOLEAN NOT NULL DEFAULT false,
-    "isSameAsPresent" BOOLEAN NOT NULL DEFAULT false,
-    "userId" TEXT NOT NULL,
-    "addressTypeId" TEXT NOT NULL,
+    "address_line" TEXT NOT NULL,
+    "division_id" TEXT NOT NULL,
+    "district_id" TEXT NOT NULL,
+    "upazila_id" TEXT,
+    "city_corporation" TEXT,
+    "municipality_id" TEXT,
+    "union_parishad_id" TEXT,
+    "police_station_id" TEXT,
+    "post_office_id" TEXT,
+    "ward_no" TEXT,
+    "zip_code" TEXT,
+    "is_city_corporation" BOOLEAN NOT NULL DEFAULT false,
+    "is_same_as_present" BOOLEAN NOT NULL DEFAULT false,
+    "user_id" TEXT NOT NULL,
+    "address_type_id" TEXT NOT NULL,
 
     CONSTRAINT "address_pkey" PRIMARY KEY ("id")
 );
@@ -254,6 +264,19 @@ CREATE TABLE "base_districts" (
     "updated_at" TIMESTAMP(0),
 
     CONSTRAINT "base_districts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "base_city_corporations" (
+    "id" SERIAL NOT NULL,
+    "district_id" INTEGER NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "bn_name" VARCHAR(100) NOT NULL,
+    "status" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(0),
+
+    CONSTRAINT "base_city_corporations_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -370,13 +393,16 @@ CREATE UNIQUE INDEX "candidate_experiences_user_id_company_name_designation_depa
 CREATE INDEX "documents_user_id_idx" ON "documents"("user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "documents_user_id_type_name_key" ON "documents"("user_id", "type", "name");
+CREATE UNIQUE INDEX "documents_user_id_name_key" ON "documents"("user_id", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "address_userId_addressTypeId_key" ON "address"("userId", "addressTypeId");
+CREATE UNIQUE INDEX "address_user_id_address_type_id_key" ON "address"("user_id", "address_type_id");
 
 -- CreateIndex
 CREATE INDEX "base_districts_division_id_idx" ON "base_districts"("division_id");
+
+-- CreateIndex
+CREATE INDEX "base_city_corporations_district_id_idx" ON "base_city_corporations"("district_id");
 
 -- CreateIndex
 CREATE INDEX "base_upazilas_district_id_idx" ON "base_upazilas"("district_id");
@@ -433,7 +459,7 @@ ALTER TABLE "candidate_references" ADD CONSTRAINT "candidate_references_user_id_
 ALTER TABLE "candidate_languages" ADD CONSTRAINT "candidate_languages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Candidate_references" ADD CONSTRAINT "Candidate_references_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "candidate_achievements" ADD CONSTRAINT "candidate_achievements_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "documents" ADD CONSTRAINT "documents_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -445,13 +471,16 @@ ALTER TABLE "documents" ADD CONSTRAINT "documents_candidate_experience_id_fkey" 
 ALTER TABLE "documents" ADD CONSTRAINT "documents_candidate_education_id_fkey" FOREIGN KEY ("candidate_education_id") REFERENCES "candidate_educations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "address" ADD CONSTRAINT "address_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "address" ADD CONSTRAINT "address_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "address" ADD CONSTRAINT "address_addressTypeId_fkey" FOREIGN KEY ("addressTypeId") REFERENCES "address_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "address" ADD CONSTRAINT "address_address_type_id_fkey" FOREIGN KEY ("address_type_id") REFERENCES "address_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "base_districts" ADD CONSTRAINT "base_districts_division_id_fkey" FOREIGN KEY ("division_id") REFERENCES "base_divisions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "base_city_corporations" ADD CONSTRAINT "base_city_corporations_district_id_fkey" FOREIGN KEY ("district_id") REFERENCES "base_districts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "base_upazilas" ADD CONSTRAINT "base_upazilas_district_id_fkey" FOREIGN KEY ("district_id") REFERENCES "base_districts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

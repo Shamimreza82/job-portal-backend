@@ -340,15 +340,14 @@ const createCandidateAddress = async (
       userId,
       divisionId: item.divisionId,
       districtId: item.districtId,
-      upazilaId: item.upazilaId,
+      upazilaOrCityCorpId: item.upazilaOrCityCorpId,
+      unionParishadOrMunicipalityId: item.unionParishadOrMunicipalityId ?? null,
       policeStationId: item.policeStationId ?? null,
-      municipalityId: item.municipalityId ?? null,
-      unionParishadId: item.unionParishadId ?? null,
-      addressLine: item.addressLine,
-      addressTypeId: item.addressTypeId,
-      wardNo: item.wardNo ?? null,
       zipCode: item.zipCode ?? null,
+      wardNo: item.wardNo ?? null,
+      addressLine: item.addressLine,
       isSameAsPresent: item.isSameAsPresent ?? false,
+      addressTypeId: item.addressTypeId,
     }));
 
     return await tx.address.createMany({

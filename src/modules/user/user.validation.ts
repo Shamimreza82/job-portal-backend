@@ -89,25 +89,6 @@ export const workExperienceSchema = z
 /////////// Exprience validation schema //////////////////////
 const workExperienceArraySchema = z.array(workExperienceSchema);
 
-const AddressTypeEnum = z.enum(['PRESENT', 'PERMANENT']);
-
-const AddressSchema = z.object({
-  id: z.string().uuid().optional(),
-  addressLine: z.string().min(1, 'Address line is required'),
-  divisionId: z.string().uuid(),
-  districtId: z.string().uuid(),
-  upazilaId: z.string().uuid().nullable().optional(),
-  municipalityId: z.string().uuid().nullable().optional(),
-  unionParishadId: z.string().uuid().nullable().optional(),
-  policeStationId: z.string().uuid().nullable().optional(),
-  postOfficeId: z.string().uuid().nullable().optional(),
-  wardNo: z.string().nullable().optional(),
-  zipCode: z.string().nullable().optional(),
-  isCityCorporation: z.boolean().default(false),
-  isSameAsPresent: z.boolean().default(false),
-  addressTypeId: AddressTypeEnum,
-});
-
 export const referenceSchema = z.object({
   name: z
     .string()
@@ -142,56 +123,45 @@ const ReferanceArraySchema = z.array(referenceSchema);
 /**
  * Address Type Enum
  */
+
 export const addressTypeEnum = z.enum(['PRESENT', 'PERMANENT']);
+
+const AddressSchema = z.object({
+  id: z.string().uuid().optional(),
+  addressLine: z.string().min(1, 'Address line is required'),
+  divisionId: z.string().uuid(),
+  districtId: z.string().uuid(),
+  upazilaOrCityCorpId: z.string().uuid().nullable().optional(),
+  unionParishadOrMunicipalityId: z.string().uuid().nullable().optional(),
+  policeStationId: z.string().uuid().nullable().optional(),
+  postOfficeId: z.string().uuid().nullable().optional(),
+  wardNo: z.string().nullable().optional(),
+  isSameAsPresent: z.boolean().default(false),
+  addressTypeId: addressTypeEnum,
+});
 
 /**
  * Single Address Schema
  */
-export const addressSchema = z
-  .object({
-    addressLine: z.string().min(5, 'Address must be at least 5 characters'),
+export const addressSchema = z.object({
+  divisionId: z.string().min(1, 'Division ID must be at least 5 characters'),
+  districtId: z.string().min(1, 'District ID must be at least 5 characters'),
+  upazilaOrCityCorpId: z
+    .string()
+    .min(1, 'Upazila/City Corporation ID must be at least 5 characters'),
+  unionParishadOrMunicipalityId: z.string().uuid().optional().nullable(),
+  policeStationId: z.string().uuid().optional().nullable(),
+  postOfficeId: z.string().uuid().optional().nullable(),
+  zipCode: z.string().max(10).optional().nullable(),
 
-    divisionId: z
-      .string()
-      .uuid()
-      .min(1, 'Division ID must be at least 5 characters'),
-    districtId: z
-      .string()
-      .uuid()
-      .min(1, 'District ID must be at least 5 characters'),
-    upazilaId: z
-      .string()
-      .uuid()
-      .min(1, 'Upazila ID must be at least 5 characters'),
+  wardNo: z.string().max(10).optional().nullable(),
+  addressLine: z.string().min(5, 'Address must be at least 5 characters'),
+  isSameAsPresent: z.boolean().optional().default(false),
 
-    municipalityId: z.string().uuid().optional().nullable(),
-    unionParishadId: z.string().uuid().optional().nullable(),
-    policeStationId: z.string().uuid().optional().nullable(),
-    postOfficeId: z.string().uuid().optional().nullable(),
-
-    wardNo: z.string().max(10).optional().nullable(),
-    zipCode: z.string().max(10).optional().nullable(),
-
-    isCityCorporation: z.boolean().optional().default(false),
-    isSameAsPresent: z.boolean().optional().default(false),
-
-    addressTypeId: z
-      .string()
-      .min(5, 'Address type ID must be at least 5 characters'),
-  })
-  .refine(
-    (data) => {
-      if (data.isCityCorporation) {
-        return !!data.municipalityId;
-      }
-      return true;
-    },
-    {
-      message: 'Municipality is required when city corporation is true',
-      path: ['municipalityId'],
-    },
-  );
-
+  addressTypeId: z
+    .string()
+    .min(5, 'Address type ID must be at least 5 characters'),
+});
 /**
  * Multiple Address Schema (optional)
  */

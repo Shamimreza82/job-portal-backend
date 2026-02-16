@@ -169,7 +169,7 @@ const getDivisionWithDistrictsAndUpazilas = async (payload: {
     if (divisionId && !districtId && !upazilaId) {
       const districts = await prisma.baseDistrict.findMany({
         where: { divisionId: Number(divisionId) },
-        select: { id: true, name: true },
+        select: { id: true, name: true, divisionId: true },
       });
       return { level: 'district', data: districts };
     }
@@ -178,19 +178,29 @@ const getDivisionWithDistrictsAndUpazilas = async (payload: {
     if (districtId && !upazilaId) {
       const upazilas = await prisma.baseUpazila.findMany({
         where: { districtId: Number(districtId) },
-        select: { id: true, name: true },
+        select: { id: true, name: true, districtId: true },
       });
       const policeStations = await prisma.basePoliceStation.findMany({
         where: { districtId: Number(districtId) },
-        select: { id: true, name: true, bnName: true },
+        select: {
+          id: true,
+          name: true,
+          bnName: true,
+          districtId: true,
+        },
       });
       const postOffices = await prisma.basePostOffice.findMany({
         where: { districtId: Number(districtId) },
-        select: { id: true, postOffice: true, postCode: true },
+        select: {
+          id: true,
+          postOffice: true,
+          postCode: true,
+          districtId: true,
+        },
       });
       const cityCorporations = await prisma.baseCityCorporation.findMany({
         where: { districtId: Number(districtId) },
-        select: { id: true, name: true },
+        select: { id: true, name: true, districtId: true },
       });
       return {
         level: 'upazila , police station, post office, city corporation',
@@ -205,11 +215,11 @@ const getDivisionWithDistrictsAndUpazilas = async (payload: {
     if (upazilaId) {
       const municipalities = await prisma.baseMunicipality.findMany({
         where: { upazilaId: Number(upazilaId) },
-        select: { id: true, name: true },
+        select: { id: true, name: true, upazilaId: true },
       });
       const unionParishads = await prisma.baseUnionParishad.findMany({
         where: { upazilaId: Number(upazilaId) },
-        select: { id: true, name: true },
+        select: { id: true, name: true, upazilaId: true },
       });
       // const postOffices = await prisma.basePoliceStation.findMany({
       //   where: { upazilaId: Number(upazilaId) },

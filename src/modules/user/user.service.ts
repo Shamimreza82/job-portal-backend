@@ -144,6 +144,11 @@ const me = async (user: TUserPayload) => {
       },
       addresses: {
         include: {
+          division: {
+            select: {
+              name: true,
+            },
+          },
           district: {
             select: {
               name: true,
@@ -152,6 +157,32 @@ const me = async (user: TUserPayload) => {
           upazila: {
             select: {
               name: true,
+            },
+          },
+          cityCorporation: {
+            select: {
+              name: true,
+            },
+          },
+          unionParishad: {
+            select: {
+              name: true,
+            },
+          },
+          municipality: {
+            select: {
+              name: true,
+            },
+          },
+          policeStation: {
+            select: {
+              name: true,
+            },
+          },
+          postOffice: {
+            select: {
+              postOffice: true,
+              postCode: true,
             },
           },
         },

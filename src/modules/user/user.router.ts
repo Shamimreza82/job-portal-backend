@@ -66,6 +66,10 @@ router.post(
 /////user address /////
 router.get('/profile/personal/dropdown', UserController.dropdown);
 router.get(
+  '/profile/address-type/dropdown',
+  UserController.getAddressTypeDropdown,
+);
+router.get(
   '/profile/address/dropdown',
   UserController.getDivisionWithDistrictsAndUpazilas,
 );

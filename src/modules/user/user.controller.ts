@@ -52,6 +52,15 @@ const dropdown = catchAsync(async (req, res) => {
   });
 });
 
+const getAddressTypeDropdown = catchAsync(async (req, res) => {
+  const result = await UserService.getAddressTypeDropdown();
+  res.status(201).json({
+    status: true,
+    message: 'get all address type dropdown successfully',
+    data: result,
+  });
+});
+
 const createCandidateEducation = catchAsync(async (req, res) => {
   const result = await UserService.createCandidateEducationService(
     req.body,
@@ -122,6 +131,7 @@ export const UserController = {
 
   //// Dropdown query
   getDivisionWithDistrictsAndUpazilas,
+  getAddressTypeDropdown,
   dropdown,
   createCandidateEducation,
   createCandidateReference,

@@ -118,6 +118,11 @@ const dropdown = async () => {
   };
 };
 
+const getAddressTypeDropdown = async () => {
+  const addressType = await prisma.addressType.findMany();
+  return addressType;
+};
+
 const me = async (user: TUserPayload) => {
   const result = await prisma.user.findUnique({
     where: { email: user.email },
@@ -140,9 +145,13 @@ const me = async (user: TUserPayload) => {
       documents: true,
       candidateExperiences: true,
       candidateReferences: true,
-      addresses: true,
     },
   });
+
+  // const address = await prisma.address.findMany({
+  //   where: { userId: result?.id },
+  // });
+
   return result;
 };
 
@@ -364,6 +373,7 @@ export const UserService = {
   createCandidateExperienceService,
   me,
   getDivisionWithDistrictsAndUpazilas,
+  getAddressTypeDropdown,
   dropdown,
   createCandidateEducationService,
   createCandidateReference,

@@ -44,23 +44,6 @@ const createCandidateExperience = catchAsync(async (req, res) => {
   });
 });
 
-const dropdown = catchAsync(async (req, res) => {
-  const result = await UserService.dropdown();
-  res.status(201).json({
-    status: true,
-    message: 'get all personal dropdown successfully',
-    data: result,
-  });
-});
-
-const getAddressTypeDropdown = catchAsync(async (req, res) => {
-  const result = await UserService.getAddressTypeDropdown();
-  res.status(201).json({
-    status: true,
-    message: 'get all address type dropdown successfully',
-    data: result,
-  });
-});
 
 const createCandidateEducation = catchAsync(async (req, res) => {
   const result = await UserService.createCandidateEducationService(
@@ -100,21 +83,6 @@ const createCandidateAddress = catchAsync(async (req, res) => {
   });
 });
 
-const getDivisionWithDistrictsAndUpazilas = catchAsync(async (req, res) => {
-  const query = req.query as {
-    divisionId: string;
-    districtId: string;
-    upazilaId: string;
-  };
-
-  const result = await UserService.getDivisionWithDistrictsAndUpazilas(query);
-  res.status(200).json({
-    status: true,
-    message: 'get all division/district/upazila successfully',
-    data: result,
-  });
-});
-
 const createCandidateAchievement = catchAsync(async (req, res) => {
 
   const files = req.files as Express.Multer.File[];
@@ -137,17 +105,69 @@ const createCandidateAchievement = catchAsync(async (req, res) => {
   });
 });
 
+//////////////////////////////////////// drop down /////////////////////////////////////////////////////////////////////////////
+
+const dropdown = catchAsync(async (req, res) => {
+  const result = await UserService.dropdown();
+  res.status(201).json({
+    status: true,
+    message: 'get all personal dropdown successfully',
+    data: result,
+  });
+});
+const getAddressTypeDropdown = catchAsync(async (req, res) => {
+  const result = await UserService.getAddressTypeDropdown();
+  res.status(201).json({
+    status: true,
+    message: 'get all address type dropdown successfully',
+    data: result,
+  });
+});
+const getDivisionWithDistrictsAndUpazilas = catchAsync(async (req, res) => {
+  const query = req.query as {
+    divisionId: string;
+    districtId: string;
+    upazilaId: string;
+  };
+
+  const result = await UserService.getDivisionWithDistrictsAndUpazilas(query);
+  res.status(200).json({
+    status: true,
+    message: 'get all division/district/upazila successfully',
+    data: result,
+  });
+});
+
+const getEducationDropdown = catchAsync(async (req, res) => {
+  const query = req.query as {
+    levelId?: string;
+  degreeId?: string;
+  candidateId?: string;
+  };
+
+  const result = await UserService.getEducationDropdown(query);
+  res.status(200).json({
+    status: true,
+    message: 'get all education dropdown successfully',
+    data: result,
+  });
+})
+
+
+
+
+
 export const UserController = {
   createCandidatePersonal,
   createCandidateExperience,
   me,
-
-  //// Dropdown query
-  getDivisionWithDistrictsAndUpazilas,
-  getAddressTypeDropdown,
-  dropdown,
   createCandidateEducation,
   createCandidateReference,
   createCandidateAddress,
   createCandidateAchievement,
+  //// Dropdown query
+  getDivisionWithDistrictsAndUpazilas,
+  getAddressTypeDropdown,
+  dropdown,
+  getEducationDropdown
 };

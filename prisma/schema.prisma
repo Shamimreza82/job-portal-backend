@@ -134,28 +134,46 @@ model BloodGroup {
 ///////////////////////////////////  CandidateEducation ///////////////////////////////////////////
 
 model CandidateEducation {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  levelId String           @map("level_id")
+  level   LevelOfEducation @relation(fields: [levelId], references: [id])
+
+  degreeId String? @map("degree_id")
+  degree   Degree? @relation(fields: [degreeId], references: [id])
+
+  boardId String?         @map("board_id")
+  board   EducationBoard? @relation(fields: [boardId], references: [id])
+
+  subjectId String?  @map("subject_id")
+  subject   Subject? @relation(fields: [subjectId], references: [id])
+
+  resultTypeId String?     @map("result_type_id")
+  resultType   ResultType? @relation(fields: [resultTypeId], references: [id])
+
+  majorGroupId String?     @map("major_group_id")
+  majorGroup   MajorGroup? @relation(fields: [majorGroupId], references: [id])
+
+  institution String?
+  passingYear Int?
+  result      String?
+
+  documents Document[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  documents        Document[]
-  levelOfEducation LevelOfEducation[]
-  degree           Degree[]
-  // educationBoard   EducationBoard?
-  subject          Subject?
 
   @@map("candidate_educations")
 }
 
 model LevelOfEducation {
   id        String @id @default(uuid())
-  levelName String @map("level_name")
+  levelName String @unique @map("level_name")
 
-  candidateEducationId String             @unique @map("candidate_education_id")
-  candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
-  degree               Degree?
+  degrees             Degree[]
+  candidateEducations CandidateEducation[]
 
   @@map("level_of_educations")
 }
@@ -164,49 +182,44 @@ model Degree {
   id         String @id @default(uuid())
   degreeName String @map("degree_name")
 
-  levelOfEducationId   String              @unique @map("level_of_education_id")
-  levelOfEducation     LevelOfEducation    @relation(fields: [levelOfEducationId], references: [id], onDelete: Cascade)
-  candidateEducation   CandidateEducation? @relation(fields: [candidateEducationId], references: [id])
-  candidateEducationId String?
+  levelId             String               @map("level_id")
+  level               LevelOfEducation     @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  candidateEducations CandidateEducation[]
 
   @@map("degrees")
 }
 
-// model EducationBoard {
-//   id        String @id @default(uuid())
-//   boardName String @map("board_name")
+model EducationBoard {
+  id                  String               @id @default(uuid())
+  boardName           String               @unique @map("board_name")
+  candidateEducations CandidateEducation[]
 
-//   candidateEducationId String             @unique @map("candidate_education_id")
-//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
-
-//   @@map("education_boards")
-// }
-
-// model MajorGroup {
-//   id        String @id @default(uuid())
-//   groupName String @map("group_name")
-
-//   candidateEducationId String             @unique @map("user_id")
-//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
-// }
-
-// model ResultType {
-//   id         String @id @default(uuid())
-//   resultType String @map("result_type")
-
-//   candidateEducationId String             @unique @map("user_id")
-//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
-// }
+  @@map("education_boards")
+}
 
 model Subject {
-  id          String  @id @default(uuid())
-  subjectName String  @map("subject_name")
-  status      Boolean @default(true)
-
-  candidateEducationId String             @unique @map("user_id")
-  candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
+  id                  String               @id @default(uuid())
+  subjectName         String               @unique @map("subject_name")
+  status              Boolean              @default(true)
+  candidateEducations CandidateEducation[]
 
   @@map("subjects")
+}
+
+model MajorGroup {
+  id                  String               @id @default(uuid())
+  groupName           String               @unique @map("group_name")
+  candidateEducations CandidateEducation[]
+
+  @@map("major_groups")
+}
+
+model ResultType {
+  id                  String               @id @default(uuid())
+  resultType          String               @unique @map("result_type")
+  candidateEducations CandidateEducation[]
+
+  @@map("result_types")
 }
 
 ///////////////////////////////////  Candidate Education ///////////////////////////////////////////
@@ -243,7 +256,7 @@ model CandidateReference {
   id String @id @default(uuid())
 
   name         String
-  companyName  String @map("company_name")
+  companyName  String? @map("company_name") 
   designation  String
   phone        String
   emailAddress String @map("email_address")
@@ -300,12 +313,11 @@ model CandidateAchievement {
   year             Int
   description      String
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents Document[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-
 
   @@map("candidate_achievements")
 }

@@ -65,7 +65,7 @@ router.post(
   UserController.createCandidateAddress,
 );
 
-/////user address /////
+/////Dropdown data /////
 router.get('/profile/personal/dropdown', UserController.dropdown);
 router.get(
   '/profile/address-type/dropdown',
@@ -75,6 +75,12 @@ router.get(
   '/profile/address/dropdown',
   UserController.getDivisionWithDistrictsAndUpazilas,
 );
+router.get(
+  '/profile/education/dropdown',
+  UserController.getEducationDropdown,
+);
+
+
 
 /////user address /////
 

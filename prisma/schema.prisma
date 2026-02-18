@@ -134,21 +134,69 @@ model BloodGroup {
 ///////////////////////////////////  CandidateEducation ///////////////////////////////////////////
 
 model CandidateEducation {
-  id          String     @id @default(uuid())
-  studyYear   String?    @map("study_year")
-  passingYear String?    @map("passing_year")
-  resultType  String?    @map("result_type")
-  result      String?
-  totalCgpa   String?    @map("total_cgpa")
-  userId      String     @map("user_id")
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
-  subjects    Subject?
-  documents   Document[]
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  documents        Document[]
+  levelOfEducation LevelOfEducation[]
+  degree           Degree[]
+  // educationBoard   EducationBoard?
+  subject          Subject?
 
   @@map("candidate_educations")
 }
+
+model LevelOfEducation {
+  id        String @id @default(uuid())
+  levelName String @map("level_name")
+
+  candidateEducationId String             @unique @map("candidate_education_id")
+  candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
+  degree               Degree?
+
+  @@map("level_of_educations")
+}
+
+model Degree {
+  id         String @id @default(uuid())
+  degreeName String @map("degree_name")
+
+  levelOfEducationId   String              @unique @map("level_of_education_id")
+  levelOfEducation     LevelOfEducation    @relation(fields: [levelOfEducationId], references: [id], onDelete: Cascade)
+  candidateEducation   CandidateEducation? @relation(fields: [candidateEducationId], references: [id])
+  candidateEducationId String?
+
+  @@map("degrees")
+}
+
+// model EducationBoard {
+//   id        String @id @default(uuid())
+//   boardName String @map("board_name")
+
+//   candidateEducationId String             @unique @map("candidate_education_id")
+//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
+
+//   @@map("education_boards")
+// }
+
+// model MajorGroup {
+//   id        String @id @default(uuid())
+//   groupName String @map("group_name")
+
+//   candidateEducationId String             @unique @map("user_id")
+//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
+// }
+
+// model ResultType {
+//   id         String @id @default(uuid())
+//   resultType String @map("result_type")
+
+//   candidateEducationId String             @unique @map("user_id")
+//   candidateEducation   CandidateEducation @relation(fields: [candidateEducationId], references: [id], onDelete: Cascade)
+// }
 
 model Subject {
   id          String  @id @default(uuid())

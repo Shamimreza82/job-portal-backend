@@ -11,7 +11,9 @@ import { documentSchema } from './upload.validation';
 const router = express.Router();
 
 ////////// Upload //////////
-router.post('/user/resume', auth(AuthGard.USER),
+router.post(
+  '/user/resume',
+  auth(AuthGard.USER),
   upload.single('resume'),
   async (req, res) => {
     const file = req.file as CustomFile; // Cast to CustomFile to access custom properties
@@ -51,7 +53,9 @@ router.post('/user/resume', auth(AuthGard.USER),
   },
 );
 
-router.post('/user/avatar', auth('USER'),
+router.post(
+  '/user/avatar',
+  auth('USER'),
   upload.single('avatar'),
   async (req, res) => {
     const file = req.file as CustomFile; // Cast to CustomFile to access custom properties
@@ -91,7 +95,9 @@ router.post('/user/avatar', auth('USER'),
   },
 );
 
-router.post('/user/signature', auth('USER'),
+router.post(
+  '/user/signature',
+  auth('USER'),
   upload.single('signature'),
   async (req, res) => {
     const file = req.file as CustomFile; // Cast to CustomFile to access custom properties
@@ -131,13 +137,14 @@ router.post('/user/signature', auth('USER'),
   },
 );
 
-router.post('/user/other', auth('USER'),
+router.post(
+  '/user/other',
+  auth('USER'),
   upload.single('other'),
   async (req, res) => {
     const file = req.file as CustomFile; // Cast to CustomFile to access custom properties
     const user = req.user as JwtPayload;
     const validateData = documentSchema.parse(JSON.parse(req.body.data));
-
 
     // Assuming metadata is sent as a JSON string in the 'data' field
     console.log('File:', validateData);
@@ -148,9 +155,6 @@ router.post('/user/other', auth('USER'),
     if (!file.documentType) {
       return res.status(400).json({ message: 'Document type is required' });
     }
-
-
-
 
     const result = await prisma.document.upsert({
       where: {
@@ -184,17 +188,16 @@ router.post('/user/other', auth('USER'),
       },
     });
 
-
     console.log(result);
 
     res.json({ message: 'File uploaded successfully', result });
   },
 );
 
-
-
-
-router.post('/user/certificate', auth('USER'), upload.single('certificate'),
+router.post(
+  '/user/certificate',
+  auth('USER'),
+  upload.single('certificate'),
   async (req, res) => {
     const file = req.file as CustomFile; // Cast to CustomFile to access custom properties
     const user = req.user as JwtPayload;
@@ -234,10 +237,5 @@ router.post('/user/certificate', auth('USER'), upload.single('certificate'),
   },
 );
 ////////// Upload //////////
-
-
-
-
-
 
 export const UploadRouter = router;
